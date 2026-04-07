@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Mail, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 
 export function EarlyAccessForm() {
@@ -46,9 +47,9 @@ export function EarlyAccessForm() {
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <CheckCircle2 className="h-6 w-6 text-green-600" />
           </div>
-          <h3 className="mt-4 text-xl font-semibold text-foreground">
+          <h2 className="mt-4 text-xl font-semibold text-foreground">
             Вы в списке!
-          </h3>
+          </h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Мы уведомим вас о запуске Light на {email}
           </p>
@@ -59,25 +60,37 @@ export function EarlyAccessForm() {
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
-      <h3 className="text-center text-xl font-semibold text-foreground">
+      <h2 className="text-center text-xl font-semibold text-foreground">
         Получите ранний доступ
-      </h3>
+      </h2>
       
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="email"
-            placeholder="Ваш email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value)
-              setError("")
-            }}
-            className={`h-11 pl-10 ${error ? "border-destructive focus-visible:ring-destructive" : ""}`}
-          />
+        <div className="space-y-2">
+          <Label htmlFor="early-access-email" className="sr-only">
+            Email
+          </Label>
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
+            <Input
+              id="early-access-email"
+              type="email"
+              placeholder="Ваш email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setError("")
+              }}
+              className={`h-11 pl-10 ${error ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              aria-invalid={!!error}
+              aria-describedby={error ? "early-access-email-error" : undefined}
+            />
+          </div>
         </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && (
+          <p id="early-access-email-error" className="text-sm text-destructive" role="alert">
+            {error}
+          </p>
+        )}
         
         <Button
           type="submit"

@@ -1,12 +1,10 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
 export function HeroSection() {
-  const router = useRouter()
-
   return (
     <section className="relative min-h-[90vh] w-full overflow-hidden">
       {/* Background Image */}
@@ -43,9 +41,9 @@ export function HeroSection() {
               <Button
                 size="lg"
                 className="rounded-full px-8 shadow-lg shadow-primary/25 transition-shadow hover:shadow-xl hover:shadow-primary/30"
-                onClick={() => router.push("/register")}
+                asChild
               >
-                Найти прямо сейчас
+                <Link href="/register">Найти прямо сейчас</Link>
               </Button>
               <Button
                 variant="outline"

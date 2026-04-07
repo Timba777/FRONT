@@ -71,26 +71,32 @@ export function Footer() {
           <p className="text-sm text-muted-foreground">
             &copy; 2026 Light. Все права защищены.
           </p>
-          <div className="flex gap-6">
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Политика конфиденциальности
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Условия обслуживания
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Cookie Policy
-            </Link>
-          </div>
+          <ul className="m-0 flex list-none flex-wrap gap-6 p-0">
+            <li>
+              <Link
+                href="#"
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Политика конфиденциальности
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="#"
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Условия обслуживания
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="#"
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Cookie Policy
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
     </footer>

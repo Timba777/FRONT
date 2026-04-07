@@ -54,27 +54,30 @@ export default function ComingSoonPage() {
         </section>
 
         {/* Countdown Section */}
-        <section className="mt-12 flex flex-col items-center">
-          <p className="mb-6 text-sm font-medium tracking-widest text-muted-foreground">
+        <section className="mt-12 flex flex-col items-center" aria-labelledby="coming-soon-countdown-heading">
+          <h2
+            id="coming-soon-countdown-heading"
+            className="mb-6 text-sm font-medium tracking-widest text-muted-foreground"
+          >
             ЗАПУСК ЧЕРЕЗ
-          </p>
+          </h2>
           <CountdownTimer targetDate={targetDate} />
         </section>
 
         {/* Early Access Form */}
-        <section className="mx-auto mt-12 max-w-md">
+        <div className="mx-auto mt-12 max-w-md">
           <EarlyAccessForm />
-        </section>
+        </div>
 
         {/* Benefits Section */}
-        <section className="mt-16">
+        <div className="mt-16">
           <BenefitsSection />
-        </section>
+        </div>
 
         {/* Telegram Community Section */}
-        <section className="mt-12">
+        <div className="mt-12">
           <TelegramSection />
-        </section>
+        </div>
       </main>
 
       {/* Footer */}
@@ -82,14 +85,18 @@ export default function ComingSoonPage() {
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <Logo size={32} />
-            <div className="flex gap-6 text-sm text-muted-foreground">
-              <Link href="#" className="hover:text-foreground transition-colors">
-                Политика конфиденциальности
-              </Link>
-              <Link href="#" className="hover:text-foreground transition-colors">
-                Условия использования
-              </Link>
-            </div>
+            <ul className="m-0 flex list-none flex-wrap gap-6 p-0 text-sm text-muted-foreground">
+              <li>
+                <Link href="#" className="hover:text-foreground transition-colors">
+                  Политика конфиденциальности
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-foreground transition-colors">
+                  Условия использования
+                </Link>
+              </li>
+            </ul>
           </div>
           <div className="mt-6 border-t border-border pt-6 text-center">
             <p className="text-sm text-muted-foreground">

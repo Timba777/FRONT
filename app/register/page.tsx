@@ -17,28 +17,31 @@ const freelancerBenefits = [
 
 export default function RoleSelectionPage() {
   return (
-    <main className="min-h-screen lg:grid lg:grid-cols-2">
-      <section className="min-h-[50vh] lg:min-h-screen">
-        <RolePanel
-          icon={<Briefcase className="h-10 w-10" strokeWidth={1.5} />}
-          title="Я Заказчик"
-          benefits={clientBenefits}
-          ctaText="Начать как заказчик"
-          href="/signup/client"
-          variant="client"
-        />
-      </section>
+    <main>
+      <h1 className="sr-only">Выбор роли при регистрации</h1>
+      <div className="min-h-screen lg:grid lg:grid-cols-2">
+        <section className="min-h-[50vh] lg:min-h-screen">
+          <RolePanel
+            icon={<Briefcase className="h-10 w-10" strokeWidth={1.5} />}
+            title="Я Заказчик"
+            benefits={clientBenefits}
+            ctaText="Начать как заказчик"
+            href="/signup/client"
+            variant="client"
+          />
+        </section>
 
-      <section className="min-h-[50vh] lg:min-h-screen">
-        <RolePanel
-          icon={<Users className="h-10 w-10" strokeWidth={1.5} />}
-          title="Я Фрилансер"
-          benefits={freelancerBenefits}
-          ctaText="Начать как фрилансер"
-          href="/signup/freelancer"
-          variant="freelancer"
-        />
-      </section>
+        <section className="min-h-[50vh] lg:min-h-screen">
+          <RolePanel
+            icon={<Users className="h-10 w-10" strokeWidth={1.5} />}
+            title="Я Фрилансер"
+            benefits={freelancerBenefits}
+            ctaText="Начать как фрилансер"
+            href="/signup/freelancer"
+            variant="freelancer"
+          />
+        </section>
+      </div>
     </main>
   )
 }

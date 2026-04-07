@@ -324,7 +324,7 @@ export function ClientSignupWizard() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-12 lg:px-8">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-12 lg:px-8">
       <div className="mx-auto w-full max-w-xl">
         {/* Brand - matching login page */}
         <div className="mb-8 flex items-center justify-center gap-2">
@@ -467,6 +467,6 @@ export function ClientSignupWizard() {
           )}
         </div>
       </div>
-    </div>
+    </main>
   )
 }

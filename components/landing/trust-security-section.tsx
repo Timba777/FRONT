@@ -44,9 +44,9 @@ export function TrustSecuritySection() {
               </p>
 
               {/* Features Grid */}
-              <div className="mt-10 grid gap-8 sm:grid-cols-3">
+              <ul className="mt-10 grid list-none gap-8 p-0 m-0 sm:grid-cols-3">
                 {features.map((feature) => (
-                  <div key={feature.title} className="text-center">
+                  <li key={feature.title} className="text-center">
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
                       <feature.icon className="h-6 w-6 text-muted-foreground" />
                     </div>
@@ -56,9 +56,9 @@ export function TrustSecuritySection() {
                     <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                       {feature.description}
                     </p>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </CardContent>
           </Card>
         </div>

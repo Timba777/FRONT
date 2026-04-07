@@ -89,23 +89,26 @@ export function LeftPanel() {
         </div>
 
         {/* Features */}
-        <div className="space-y-3">
+        <ul className="list-none space-y-3 p-0 m-0">
           {features.map((feature, index) => (
-            <FeatureCard key={index} text={feature} />
+            <li key={index}>
+              <FeatureCard text={feature} />
+            </li>
           ))}
-        </div>
+        </ul>
 
         {/* Testimonials */}
-        <div className="space-y-3">
+        <ul className="list-none space-y-3 p-0 m-0">
           {testimonials.map((testimonial, index) => (
-            <TestimonialCard
-              key={index}
-              quote={testimonial.quote}
-              author={testimonial.author}
-              role={testimonial.role}
-            />
+            <li key={index}>
+              <TestimonialCard
+                quote={testimonial.quote}
+                author={testimonial.author}
+                role={testimonial.role}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
       {/* CTA Button */}

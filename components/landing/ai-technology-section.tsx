@@ -79,9 +79,9 @@ export function AITechnologySection() {
                 </div>
 
                 {/* Freelancer List */}
-                <div className="divide-y divide-border/50">
+                <ul className="m-0 list-none divide-y divide-border/50 p-0">
                   {freelancerMatches.map((freelancer) => (
-                    <div
+                    <li
                       key={freelancer.name}
                       className="flex items-center gap-4 px-5 py-4"
                     >
@@ -111,9 +111,9 @@ export function AITechnologySection() {
                           Посмотреть профиль
                         </Button>
                       </div>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </CardContent>
             </Card>
           </div>

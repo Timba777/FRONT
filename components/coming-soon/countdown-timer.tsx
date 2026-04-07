@@ -62,9 +62,9 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
 
   if (!mounted) {
     return (
-      <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+      <ol className="m-0 flex list-none flex-wrap justify-center gap-3 p-0 sm:gap-4">
         {timeUnits.map((unit, index) => (
-          <div
+          <li
             key={index}
             className="flex min-w-[70px] flex-col items-center rounded-xl border border-primary/20 bg-card px-4 py-4 shadow-sm sm:min-w-[85px] sm:px-6 sm:py-5"
           >
@@ -72,16 +72,16 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
             <span className="mt-1 text-[10px] font-medium tracking-wider text-muted-foreground sm:text-xs">
               {unit.label}
             </span>
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
     )
   }
 
   return (
-    <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+    <ol className="m-0 flex list-none flex-wrap justify-center gap-3 p-0 sm:gap-4">
       {timeUnits.map((unit, index) => (
-        <div
+        <li
           key={index}
           className="animate-in fade-in slide-in-from-bottom-2 flex min-w-[70px] flex-col items-center rounded-xl border border-primary/20 bg-card px-4 py-4 shadow-sm transition-all duration-300 hover:shadow-md sm:min-w-[85px] sm:px-6 sm:py-5"
           style={{ animationDelay: `${index * 100}ms`, animationFillMode: "both" }}
@@ -92,8 +92,8 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
           <span className="mt-1 text-[10px] font-medium tracking-wider text-muted-foreground sm:text-xs">
             {unit.label}
           </span>
-        </div>
+        </li>
       ))}
-    </div>
+    </ol>
   )
 }

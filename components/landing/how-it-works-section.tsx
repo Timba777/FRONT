@@ -39,11 +39,11 @@ export function HowItWorksSection() {
         </div>
 
         {/* Steps Grid */}
-        <div className="mx-auto mt-12 grid max-w-5xl gap-6 sm:mt-16 lg:grid-cols-3">
+        <ol className="mx-auto mt-12 grid max-w-5xl list-none gap-6 p-0 sm:mt-16 lg:grid-cols-3">
           {steps.map((step) => (
+            <li key={step.number}>
             <Card
-              key={step.number}
-              className="relative overflow-hidden border-border/50 bg-white shadow-sm transition-shadow hover:shadow-md"
+              className="relative h-full overflow-hidden border-border/50 bg-white shadow-sm transition-shadow hover:shadow-md"
             >
               <CardContent className="p-6 sm:p-8">
                 {/* Step Number Badge - Increased size with soft gradient */}
@@ -68,9 +68,10 @@ export function HowItWorksSection() {
                 </p>
               </CardContent>
             </Card>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
-    </section >
+    </section>
   )
 }

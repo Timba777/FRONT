@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Star, Check, Trophy, Briefcase } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -13,8 +13,6 @@ const benefits = [
 ]
 
 export function FreelancerSection() {
-  const router = useRouter()
-
   return (
     <section id="for-freelancers" className="bg-background py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -101,12 +99,8 @@ export function FreelancerSection() {
               ))}
             </ul>
 
-            <Button
-              variant="outline"
-              className="mt-8 rounded-full px-8"
-              onClick={() => router.push("/signup/freelancer")}
-            >
-              Присоединяйтесь
+            <Button variant="outline" className="mt-8 rounded-full px-8" asChild>
+              <Link href="/signup/freelancer">Присоединяйтесь</Link>
             </Button>
           </div>
         </div>

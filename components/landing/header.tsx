@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/shared/logo"
@@ -14,7 +13,6 @@ const navLinks = [
 ]
 
 export function Header() {
-  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
@@ -28,32 +26,28 @@ export function Header() {
         </div>
 
         {/* Center */}
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </a>
-          ))}
+        <nav className="hidden md:block" aria-label="Основная навигация">
+          <ul className="flex list-none items-center gap-8 p-0 m-0">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </nav>
 
         {/* Right */}
         <div className="hidden shrink-0 items-center gap-3 md:flex">
-          <Button
-            variant="ghost"
-            className="text-sm font-medium"
-            onClick={() => router.push("/register")}
-          >
-            Регистрация
+          <Button variant="ghost" className="text-sm font-medium" asChild>
+            <Link href="/register">Регистрация</Link>
           </Button>
-          <Button
-            className="rounded-full px-5"
-            onClick={() => router.push("/")}
-          >
-            Войти
+          <Button className="rounded-full px-5" asChild>
+            <Link href="/">Войти</Link>
           </Button>
         </div>
 
@@ -62,7 +56,9 @@ export function Header() {
           type="button"
           className="md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="landing-mobile-nav"
+          aria-label={mobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
         >
           {mobileMenuOpen ? (
             <X className="h-6 w-6 text-foreground" />
@@ -74,35 +70,39 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-border/40 bg-background md:hidden">
-          <div className="space-y-1 px-4 py-4">
+        <nav
+          id="landing-mobile-nav"
+          className="border-t border-border/40 bg-background md:hidden"
+          aria-label="Мобильная навигация"
+        >
+          <ul className="list-none space-y-1 p-0 px-4 py-4 m-0">
             {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="block rounded-lg px-3 py-2 text-base font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {link.label}
-              </a>
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  className="block rounded-lg px-3 py-2 text-base font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </a>
+              </li>
             ))}
-            <div className="mt-4 flex flex-col gap-2 pt-4">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => router.push("/register")}
-              >
-                Регистрация
-              </Button>
-              <Button
-                className="w-full"
-                onClick={() => router.push("/")}
-              >
-                Войти
-              </Button>
-            </div>
-          </div>
-        </div>
+            <li className="mt-4 pt-4">
+              <div className="flex flex-col gap-2">
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                    Регистрация
+                  </Link>
+                </Button>
+                <Button className="w-full" asChild>
+                  <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+                    Войти
+                  </Link>
+                </Button>
+              </div>
+            </li>
+          </ul>
+        </nav>
       )}
     </header>
   )

@@ -1,7 +1,7 @@
 "use client"
 
 import { ReactNode } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BenefitList } from "./benefit-list"
@@ -23,11 +23,10 @@ export function RolePanel({
   href,
   variant,
 }: RolePanelProps) {
-  const router = useRouter()
   const isClient = variant === "client"
 
   return (
-    <div
+    <article
       className={`flex h-full flex-col items-center justify-center px-8 py-12 lg:px-16 xl:px-24 ${
         isClient
           ? "bg-gradient-to-br from-[#c7d2fe] via-[#a5b4fc] to-[#818cf8]"
@@ -67,17 +66,19 @@ export function RolePanel({
 
         {/* CTA Button */}
         <Button
-          onClick={() => router.push(href)}
+          asChild
           className={`h-14 w-full rounded-xl text-base font-medium transition-all hover:scale-[1.02] ${
             isClient
               ? "bg-white text-foreground shadow-lg hover:bg-white/95"
               : "bg-gradient-to-r from-[#a5b4fc] to-[#818cf8] text-white shadow-lg hover:from-[#818cf8] hover:to-[#6366f1]"
           }`}
         >
-          {ctaText}
-          <ArrowRight className="ml-2 h-5 w-5" />
+          <Link href={href}>
+            {ctaText}
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
         </Button>
       </div>
-    </div>
+    </article>
   )
 }

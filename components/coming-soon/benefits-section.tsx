@@ -30,9 +30,9 @@ export function BenefitsSection() {
         </p>
       </div>
       
-      <div className="mt-8 grid gap-4 sm:grid-cols-3 sm:gap-6">
+      <ul className="mt-8 grid list-none gap-4 p-0 m-0 sm:grid-cols-3 sm:gap-6">
         {benefits.map((benefit, index) => (
-          <div
+          <li
             key={index}
             className="flex flex-col items-center rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all duration-200 hover:shadow-md"
           >
@@ -45,9 +45,9 @@ export function BenefitsSection() {
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {benefit.description}
             </p>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   )
 }

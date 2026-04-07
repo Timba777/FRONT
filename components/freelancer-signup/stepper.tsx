@@ -15,7 +15,7 @@ interface StepperProps {
 
 export function Stepper({ steps, currentStep }: StepperProps) {
   return (
-    <div className="relative">
+    <nav aria-label="Шаги регистрации" className="relative">
       {/* Progress bar background */}
       <div className="absolute top-5 left-0 right-0 h-0.5 bg-border mx-14" />
       
@@ -28,13 +28,13 @@ export function Stepper({ steps, currentStep }: StepperProps) {
         }}
       />
 
-      <div className="relative flex items-start justify-between">
+      <ol className="relative m-0 flex list-none items-start justify-between p-0">
         {steps.map((step) => {
           const isCompleted = step.id < currentStep
           const isCurrent = step.id === currentStep
 
           return (
-            <div key={step.id} className="flex flex-col items-center">
+            <li key={step.id} className="flex flex-col items-center">
               {/* Step circle */}
               <div
                 className={cn(
@@ -67,10 +67,10 @@ export function Stepper({ steps, currentStep }: StepperProps) {
               >
                 {step.label}
               </span>
-            </div>
+            </li>
           )
         })}
-      </div>
-    </div>
+      </ol>
+    </nav>
   )
 }

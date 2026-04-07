@@ -73,7 +73,7 @@ export function ProfileStep({ data, onChange, errors, touched, onBlur }: Profile
             <>
               <img
                 src={data.avatarUrl}
-                alt="Avatar"
+                alt="Загруженное фото профиля"
                 className="h-full w-full object-cover"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-foreground/40 opacity-0 transition-opacity hover:opacity-100">

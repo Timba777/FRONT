@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -232,21 +233,19 @@ export function LoginForm() {
         {/* Sign Up Links */}
         <div className="mt-8 text-center">
           <span className="text-sm text-muted-foreground">Нет аккаунта? </span>
-          <button
-            type="button"
-            onClick={() => router.push("/signup/client")}
+          <Link
+            href="/signup/client"
             className="text-sm font-medium text-foreground hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
           >
             Присоединиться как заказчик
-          </button>
+          </Link>
           <span className="mx-2 text-muted-foreground">•</span>
-          <button
-            type="button"
-            onClick={() => router.push("/signup/freelancer")}
+          <Link
+            href="/signup/freelancer"
             className="text-sm font-medium text-foreground hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
           >
             Присоединиться как фрилансер
-          </button>
+          </Link>
         </div>
 
         {/* Remember Me */}
