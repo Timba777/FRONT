@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "@/components/login/social-login-button"
 import { Stepper } from "@/components/freelancer-signup/stepper"
+import { register } from "@/services/auth"
 import { AccountStep } from "./steps/account-step"
 import { ProfileStep } from "./steps/profile-step"
 import { SettingsStep } from "./steps/settings-step"
@@ -245,19 +246,19 @@ export function ClientSignupWizard() {
 
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    // In a real app, you would send data to your API here
-    console.log("Submitting client registration:", {
-      account: accountData,
-      profile: profileData,
-      settings: settingsData,
-    })
-
-    setIsSubmitting(false)
-    // Redirect to login page as specified
-    router.push("/coming-soon")
+    try {
+      await register({
+        role: "client",
+        account: accountData,
+        profile: profileData,
+        settings: settingsData,
+      })
+      router.push("/coming-soon")
+    } catch (error) {
+      console.error("Client registration failed:", error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const renderStep = () => {

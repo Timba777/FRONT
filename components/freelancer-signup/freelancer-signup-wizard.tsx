@@ -14,6 +14,7 @@ import { SkillsStep } from "./steps/skills-step"
 import { PortfolioStep } from "./steps/portfolio-step"
 import type { PortfolioProject } from "./portfolio-builder"
 import { cn } from "@/lib/utils"
+import { register } from "@/services/auth"
 
 const steps = [
   { id: 1, label: "Аккаунт" },
@@ -228,20 +229,20 @@ export function FreelancerSignupWizard() {
   const handleSubmit = async () => {
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    // In a real app, you would send data to your API here
-    console.log("Submitting:", {
-      account: accountData,
-      profile: profileData,
-      skills,
-      portfolio: portfolioProjects,
-    })
-
-    setIsSubmitting(false)
-    // Redirect to success page or dashboard
-    router.push("/coming-soon")
+    try {
+      await register({
+        role: "freelancer",
+        account: accountData,
+        profile: profileData,
+        skills,
+        portfolio: portfolioProjects,
+      })
+      router.push("/coming-soon")
+    } catch (error) {
+      console.error("Freelancer registration failed:", error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const renderStep = () => {

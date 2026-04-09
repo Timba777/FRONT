@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import Link from "next/link"
 import { Sparkles } from "lucide-react"
 import { Logo } from "@/components/shared/logo"
@@ -8,6 +8,7 @@ import { CountdownTimer } from "@/components/coming-soon/countdown-timer"
 import { EarlyAccessForm } from "@/components/coming-soon/early-access-form"
 import { BenefitsSection } from "@/components/coming-soon/benefits-section"
 import { TelegramSection } from "@/components/coming-soon/telegram-section"
+import { getMe } from "@/services/auth"
 
 export default function ComingSoonPage() {
   // Calculate target date: 56 days from now
@@ -15,6 +16,12 @@ export default function ComingSoonPage() {
     const date = new Date()
     date.setDate(date.getDate() + 56)
     return date
+  }, [])
+
+  useEffect(() => {
+    getMe().catch(() => {
+      // 401 is handled by axios interceptor; other errors are ignored here.
+    })
   }, [])
 
   return (

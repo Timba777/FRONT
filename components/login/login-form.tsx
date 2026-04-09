@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "./social-login-button"
+import { login } from "@/services/auth"
 
 export function LoginForm() {
   const router = useRouter()
@@ -69,11 +70,18 @@ export function LoginForm() {
     if (emailError || passwordError) return
     
     setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsLoading(false)
-    // Redirect to coming soon page after successful login
-    router.push("/coming-soon")
+    try {
+      await login(email, password)
+      router.push("/coming-soon")
+    } catch {
+      setErrors((prev) => ({
+        ...prev,
+        password: "Не удалось войти. Проверьте данные и попробуйте снова",
+      }))
+      setTouched((prev) => ({ ...prev, password: true }))
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
