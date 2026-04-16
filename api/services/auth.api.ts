@@ -3,6 +3,7 @@ import { apiClient } from "@/api/client/api-client"
 import { errorProcessing } from "@/api/helpers/error-processing"
 import type { LoginDto } from "@/api/dto/auth/login.dto"
 import type { RegisterDto } from "@/api/dto/auth/register.dto"
+import type { ConfirmationDto } from "@/api/dto/auth/confirmation.dto"
 
 class AuthApi {
   async login(data: LoginDto) {
@@ -34,6 +35,14 @@ class AuthApi {
       return await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT)
     } catch (err) {
       throw errorProcessing(err, "выходе")
+    }
+  }
+
+  async confirmEmail(data: ConfirmationDto) {
+    try {
+      return await apiClient.post(API_ENDPOINTS.AUTH.EMAIL_CONFIRMATION, data)
+    } catch (err) {
+      throw errorProcessing(err, "подтверждении email")
     }
   }
 }

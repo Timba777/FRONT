@@ -1,13 +1,13 @@
 "use client"
 
 import { useState, useCallback, useRef } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "@/components/login/social-login-button"
 import { Stepper } from "@/components/freelancer-signup/stepper"
+import { EmailConfirmationDialog } from "@/components/auth/email-confirmation-dialog"
 import { register } from "@/services/auth"
 import { useAuth } from "@/context/auth-context"
 import { UserRole } from "@/types/user-role.enum"
@@ -46,10 +46,11 @@ interface SettingsData {
 }
 
 export function ClientSignupWizard() {
-  const router = useRouter()
   const { checkAuth } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState("")
   const [isAnimating, setIsAnimating] = useState(false)
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right")
   const contentRef = useRef<HTMLDivElement>(null)
@@ -237,6 +238,11 @@ export function ClientSignupWizard() {
     })
   }
 
+  const handleEditEmail = () => {
+    setIsConfirmationDialogOpen(false)
+    setCurrentStep(1)
+  }
+
   const handleSubmit = async () => {
     const errors = validateSettings()
     if (Object.keys(errors).length > 0) {
@@ -263,7 +269,8 @@ export function ClientSignupWizard() {
         role: UserRole.CUSTOMER,
       })
       await checkAuth()
-      router.push("/coming-soon")
+      setRegisteredEmail(normalizedEmail)
+      setIsConfirmationDialogOpen(true)
     } catch (error) {
       console.error("Client registration failed:", error)
       const backendResponse = (error as any)?.originalError?.response
@@ -485,6 +492,12 @@ export function ClientSignupWizard() {
           )}
         </div>
       </div>
+      <EmailConfirmationDialog
+        open={isConfirmationDialogOpen}
+        email={registeredEmail}
+        onClose={() => setIsConfirmationDialogOpen(false)}
+        onEditEmail={handleEditEmail}
+      />
     </main>
   )
 }

@@ -1,19 +1,18 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useCallback, useRef } from "react"
 import Link from "next/link"
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "@/components/login/social-login-button"
+import { EmailConfirmationDialog } from "@/components/auth/email-confirmation-dialog"
 import { Stepper } from "./stepper"
 import { AccountStep } from "./steps/account-step"
 import { ProfileStep } from "./steps/profile-step"
 import { SkillsStep } from "./steps/skills-step"
 import { PortfolioStep } from "./steps/portfolio-step"
 import type { PortfolioProject } from "./portfolio-builder"
-import { cn } from "@/lib/utils"
 import { register } from "@/services/auth"
 import { useAuth } from "@/context/auth-context"
 import { UserRole } from "@/types/user-role.enum"
@@ -42,10 +41,11 @@ interface ProfileData {
 }
 
 export function FreelancerSignupWizard() {
-  const router = useRouter()
   const { checkAuth } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState("")
   const [isAnimating, setIsAnimating] = useState(false)
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right")
   const contentRef = useRef<HTMLDivElement>(null)
@@ -229,6 +229,11 @@ export function FreelancerSignupWizard() {
     })
   }
 
+  const handleEditEmail = () => {
+    setIsConfirmationDialogOpen(false)
+    setCurrentStep(1)
+  }
+
   const handleSubmit = async () => {
     setIsSubmitting(true)
 
@@ -246,7 +251,8 @@ export function FreelancerSignupWizard() {
         role: UserRole.MASTER,
       })
       await checkAuth()
-      router.push("/coming-soon")
+      setRegisteredEmail(normalizedEmail)
+      setIsConfirmationDialogOpen(true)
     } catch (error) {
       console.error("Freelancer registration failed:", error)
     } finally {
@@ -475,6 +481,12 @@ export function FreelancerSignupWizard() {
           )}
         </div>
       </div>
+      <EmailConfirmationDialog
+        open={isConfirmationDialogOpen}
+        email={registeredEmail}
+        onClose={() => setIsConfirmationDialogOpen(false)}
+        onEditEmail={handleEditEmail}
+      />
     </main>
   )
 }

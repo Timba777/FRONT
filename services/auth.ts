@@ -1,6 +1,7 @@
 import { authApi } from "@/api/services/auth.api"
 import type { LoginDto } from "@/api/dto/auth/login.dto"
 import type { RegisterDto } from "@/api/dto/auth/register.dto"
+import type { ConfirmationDto } from "@/api/dto/auth/confirmation.dto"
 
 export interface LoginPayload extends LoginDto {}
 
@@ -21,6 +22,10 @@ export const getMe = async () => {
 
 export const logout = async () => {
   return authApi.logout()
+}
+
+export const confirmEmail = async (data: ConfirmationDto) => {
+  return authApi.confirmEmail(data)
 }
 
 export { authApi }
