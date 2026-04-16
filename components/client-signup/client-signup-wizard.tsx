@@ -9,6 +9,8 @@ import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "@/components/login/social-login-button"
 import { Stepper } from "@/components/freelancer-signup/stepper"
 import { register } from "@/services/auth"
+import { useAuth } from "@/context/auth-context"
+import { UserRole } from "@/types/user-role.enum"
 import { AccountStep } from "./steps/account-step"
 import { ProfileStep } from "./steps/profile-step"
 import { SettingsStep } from "./steps/settings-step"
@@ -45,6 +47,7 @@ interface SettingsData {
 
 export function ClientSignupWizard() {
   const router = useRouter()
+  const { checkAuth } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -257,8 +260,9 @@ export function ClientSignupWizard() {
         password: accountData.password,
         passwordRepeat: accountData.password,
         passwordReapeat: accountData.password,
-        role: "CUSTOMER",
+        role: UserRole.CUSTOMER,
       })
+      await checkAuth()
       router.push("/coming-soon")
     } catch (error) {
       console.error("Client registration failed:", error)

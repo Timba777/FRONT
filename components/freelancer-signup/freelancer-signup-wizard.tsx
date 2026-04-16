@@ -15,6 +15,8 @@ import { PortfolioStep } from "./steps/portfolio-step"
 import type { PortfolioProject } from "./portfolio-builder"
 import { cn } from "@/lib/utils"
 import { register } from "@/services/auth"
+import { useAuth } from "@/context/auth-context"
+import { UserRole } from "@/types/user-role.enum"
 
 const steps = [
   { id: 1, label: "Аккаунт" },
@@ -41,6 +43,7 @@ interface ProfileData {
 
 export function FreelancerSignupWizard() {
   const router = useRouter()
+  const { checkAuth } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -230,13 +233,19 @@ export function FreelancerSignupWizard() {
     setIsSubmitting(true)
 
     try {
+      const normalizedName = accountData.fullName.trim()
+      const normalizedEmail = accountData.email.trim()
+
       await register({
-        role: "freelancer",
-        account: accountData,
-        profile: profileData,
-        skills,
-        portfolio: portfolioProjects,
+        firstName: normalizedName,
+        name: normalizedName,
+        email: normalizedEmail,
+        password: accountData.password,
+        passwordRepeat: accountData.password,
+        passwordReapeat: accountData.password,
+        role: UserRole.MASTER,
       })
+      await checkAuth()
       router.push("/coming-soon")
     } catch (error) {
       console.error("Freelancer registration failed:", error)

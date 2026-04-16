@@ -2,15 +2,18 @@
 
 import { useEffect, useMemo } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Sparkles } from "lucide-react"
 import { Logo } from "@/components/shared/logo"
 import { CountdownTimer } from "@/components/coming-soon/countdown-timer"
 import { EarlyAccessForm } from "@/components/coming-soon/early-access-form"
 import { BenefitsSection } from "@/components/coming-soon/benefits-section"
 import { TelegramSection } from "@/components/coming-soon/telegram-section"
-import { getMe } from "@/services/auth"
+import { useAuth } from "@/context/auth-context"
 
 export default function ComingSoonPage() {
+  const router = useRouter()
+  const { loading, isAuthenticated, checkAuth } = useAuth()
   // Calculate target date: 56 days from now
   const targetDate = useMemo(() => {
     const date = new Date()
@@ -19,10 +22,16 @@ export default function ComingSoonPage() {
   }, [])
 
   useEffect(() => {
-    getMe().catch(() => {
-      // 401 is handled by axios interceptor; other errors are ignored here.
-    })
-  }, [])
+    if (!isAuthenticated) {
+      void checkAuth()
+    }
+  }, [isAuthenticated, checkAuth])
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace("/")
+    }
+  }, [loading, isAuthenticated, router])
 
   return (
     <div className="min-h-screen bg-background">

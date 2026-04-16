@@ -1,4 +1,4 @@
-export type RegisterRole = "ADMIN" | "MASTER" | "CUSTOMER"
+import { UserRole } from "@/types/user-role.enum"
 
 // Backend register DTO (flat payload required by /auth/register).
 // Index signature is kept for backward compatibility with existing callers.
@@ -12,6 +12,6 @@ export interface RegisterDto {
   passwordRepeat?: string
   // Temporary backend-compat field (typo in backend validator).
   passwordReapeat: string
-  role: RegisterRole
+  role: UserRole
   [key: string]: unknown
 }

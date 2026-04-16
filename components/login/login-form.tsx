@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "./social-login-button"
-import { login } from "@/services/auth"
+import { useAuth } from "@/context/auth-context"
 
 export function LoginForm() {
   const router = useRouter()
+  const { login } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
