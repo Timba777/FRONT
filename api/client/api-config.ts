@@ -1,6 +1,7 @@
 export const API_CONFIG = {
-  // Explicit backend origin is required for stable cookie auth and CORS in browser.
-  baseURL: "http://localhost/api",
+  // Temporary direct backend connection while nginx is unstable.
+  // TODO: switch back to "http://localhost:80/api" after nginx is fixed.
+  baseURL: "http://localhost:4000/api",
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",

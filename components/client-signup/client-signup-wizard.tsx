@@ -247,15 +247,28 @@ export function ClientSignupWizard() {
     setIsSubmitting(true)
 
     try {
+      const normalizedName = accountData.fullName.trim()
+      const normalizedEmail = accountData.email.trim()
+
       await register({
-        role: "client",
-        account: accountData,
-        profile: profileData,
-        settings: settingsData,
+        firstName: normalizedName,
+        name: normalizedName,
+        email: normalizedEmail,
+        password: accountData.password,
+        passwordRepeat: accountData.password,
+        passwordReapeat: accountData.password,
+        role: "CUSTOMER",
       })
       router.push("/coming-soon")
     } catch (error) {
       console.error("Client registration failed:", error)
+      const backendResponse = (error as any)?.originalError?.response
+      if (backendResponse) {
+        console.error("Client registration backend response:", {
+          status: backendResponse.status,
+          data: backendResponse.data,
+        })
+      }
     } finally {
       setIsSubmitting(false)
     }
