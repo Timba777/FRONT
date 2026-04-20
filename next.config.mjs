@@ -3,6 +3,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    prerender: false,
+  },
   images: {
     unoptimized: true,
     qualities: [75, 90],
