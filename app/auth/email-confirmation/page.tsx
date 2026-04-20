@@ -1,6 +1,8 @@
-"use client"
+export const dynamic = 'force-dynamic';
 
-import { useEffect, useMemo, useState } from "react"
+"use client";
+
+import { useEffect, useMemo, useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Spinner } from "@/components/ui/spinner"
@@ -9,7 +11,7 @@ import { confirmEmail } from "@/services/auth"
 
 type ConfirmationStatus = "idle" | "loading" | "success" | "error"
 
-export default function EmailConfirmationPage() {
+function EmailConfirmationContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<ConfirmationStatus>("idle")
@@ -88,3 +90,10 @@ export default function EmailConfirmationPage() {
   )
 }
 
+export default function EmailConfirmationPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <EmailConfirmationContent />
+    </Suspense>
+  )
+}
