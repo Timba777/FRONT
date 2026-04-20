@@ -1,6 +1,8 @@
 "use client";
 
 export const dynamic = 'force-dynamic';
+
+import { Suspense } from "react"
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -10,7 +12,7 @@ import { confirmEmail } from "@/services/auth"
 
 type VerificationStatus = "idle" | "loading" | "success" | "error"
 
-export default function NewVerificationPage() {
+function NewVerificationContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<VerificationStatus>("idle")
@@ -87,3 +89,10 @@ export default function NewVerificationPage() {
   )
 }
 
+export default function NewVerificationPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <NewVerificationContent />
+    </Suspense>
+  )
+}
