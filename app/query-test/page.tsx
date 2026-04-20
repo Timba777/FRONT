@@ -1,8 +1,11 @@
-"use client"
+"use client";
 
+export const dynamic = 'force-dynamic';
+
+import { Suspense } from "react"
 import { useQueryParams } from "@/api/helpers/use-query-params"
 
-export default function QueryTestPage() {
+function QueryTestContent() {
   const { params, getParam, setParams, removeParam } = useQueryParams()
 
   return (
@@ -31,5 +34,13 @@ export default function QueryTestPage() {
         Remove id
       </button>
     </div>
+  )
+}
+
+export default function QueryTestPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 20 }}>Loading...</div>}>
+      <QueryTestContent />
+    </Suspense>
   )
 }
