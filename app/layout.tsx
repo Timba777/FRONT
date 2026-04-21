@@ -37,6 +37,46 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
+      <head>
+        <meta charSet="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Light — современная фриланс биржа для профессионалов. Без комиссий, быстрые выплаты, умный подбор заказов. Присоединяйтесь к сообществу лучших специалистов на lightfreelance.ru." />
+        <meta name="keywords" content="фриланс, биржа фриланса, удаленная работа, заказы на фрилансе, заработок в интернете, Light фриланс, lightfreelance, фриланс биржа нового поколения" />
+        <meta name="author" content="Light Team" />
+        <meta name="robots" content="noarchive" />
+        
+        <link rel="canonical" href="https://lightfreelance.ru" />
+      
+        <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
+        
+        <meta property="og:title" content="Light — Фриланс биржа нового поколения" />
+        <meta property="og:description" content="Работайте без комиссий, получайте быстрые выплаты и находите лучшие заказы. Light меняет правила игры на рынке фриланса." />
+        <meta property="og:image" content="https://lightfreelance.ru/images/og-preview.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:url" content="https://lightfreelance.ru" />
+        <meta property="og:type" content="website" />
+        <meta property="og:locale" content="ru_RU" />
+        <meta property="og:site_name" content="Light" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Light — Фриланс биржа нового поколения" />
+        <meta name="twitter:description" content="Работайте без комиссий, получайте быстрые выплаты и находите лучшие заказы. Light меняет правила игры на рынке фриланса." />
+        <meta name="twitter:image" content="https://lightfreelance.ru/images/twitter-preview.jpg" />
+        
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="theme-color" content="#6366f1" />
+        
+
+        <link rel="alternate" href="https://lightfreelance.ru" hrefLang="x-default" />
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        
+        
+      </head>
+
       <body className="font-sans antialiased">
         <AuthProvider>{children}</AuthProvider>
         <Analytics />
