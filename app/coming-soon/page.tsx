@@ -16,7 +16,7 @@ export default function ComingSoonPage() {
   const { loading, isAuthenticated, checkAuth } = useAuth()
   // Calculate target date: 56 days from now
   const targetDate = useMemo(() => {
-    const date = new Date()
+    const date = new Date('2026-04-21T00:00:00')
     date.setDate(date.getDate() + 56)
     return date
   }, [])
