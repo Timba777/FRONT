@@ -17,7 +17,7 @@ export interface ClientSignupProfileData {
 export interface ClientSignupSettingsData {
   budgetRange: [number, number]
   hiringFrequency: string
-  experienceLevels: string[]
+  experienceLevel: string
   notifyTopMatches: boolean
   sendWeeklySummary: boolean
   autoInviteHighMatches: boolean
@@ -27,7 +27,7 @@ export interface ClientSignupSettingsData {
 const UI_HIRING_FREQUENCY = ["weekly", "monthly", "quarterly", "occasionally"] as const
 export type UiHiringFrequency = (typeof UI_HIRING_FREQUENCY)[number]
 
-/** Values from `SettingsStep` experience checkboxes — must stay in sync with UI. */
+/** Values from `SettingsStep` experience level buttons — must stay in sync with UI. */
 const UI_EXPERIENCE_LEVEL = ["beginner", "intermediate", "expert"] as const
 export type UiExperienceLevel = (typeof UI_EXPERIENCE_LEVEL)[number]
 
@@ -44,23 +44,10 @@ const UI_HIRING_TO_BACKEND: Record<UiHiringFrequency, HiringFrequency> = {
   occasionally: HiringFrequency.Иногда,
 }
 
-const UI_EXPERIENCE_RANK: Record<UiExperienceLevel, number> = {
-  beginner: 1,
-  intermediate: 2,
-  expert: 3,
-}
-
-function mapExperienceRankToBackend(rank: number): LevelExperience {
-  switch (rank) {
-    case 1:
-      return LevelExperience.Начинающий
-    case 2:
-      return LevelExperience.Средний
-    case 3:
-      return LevelExperience.Эксперт
-    default:
-      return LevelExperience.Средний
-  }
+const UI_EXPERIENCE_TO_BACKEND: Record<UiExperienceLevel, LevelExperience> = {
+  beginner: LevelExperience.Начинающий,
+  intermediate: LevelExperience.Средний,
+  expert: LevelExperience.Эксперт,
 }
 
 /**
@@ -77,36 +64,27 @@ export function mapHiringFrequency(uiValue: string): HiringFrequency {
 }
 
 /**
- * Backend expects a single `LevelExperience`; the wizard allows multiple checkboxes.
- * Strategy: take the highest selected level (expert > intermediate > beginner).
- * If none selected, defaults to `Средний` (matches common default in UI defaults).
+ * Maps single wizard `experienceLevel` to backend `LevelExperience`.
+ * Empty string falls back to `Средний` (matches previous default intent).
  */
-/**
- * Maps wizard `experienceLevels: string[]` to a single backend `LevelExperience`
- * (highest selected level; default `Средний` if none).
- */
-export function mapLevelExperience(levels: string[]): LevelExperience {
-  let maxRank = 0
-  for (const level of levels) {
-    if (isUiExperienceLevel(level)) {
-      const rank = UI_EXPERIENCE_RANK[level]
-      if (rank > maxRank) maxRank = rank
-    }
-  }
-  if (maxRank === 0) {
+export function mapLevelExperience(uiValue: string): LevelExperience {
+  const trimmed = uiValue.trim()
+  if (trimmed.length === 0) {
     return LevelExperience.Средний
   }
-  return mapExperienceRankToBackend(maxRank)
+  if (!isUiExperienceLevel(trimmed)) {
+    throw new Error(
+      `Unknown experienceLevel UI value "${uiValue}". Expected one of: ${UI_EXPERIENCE_LEVEL.join(", ")}`
+    )
+  }
+  return UI_EXPERIENCE_TO_BACKEND[trimmed]
 }
 
 /**
- * `budgetRange` is [min, max] in thousands (UI slider); backend expects one positive `number`.
- * Uses rounded midpoint; ensures value satisfies typical `@IsPositive()` rules.
+ * Backend `budget`: upper bound of the wizard slider range (`budgetRange[1]`), per product/backend contract.
  */
-export function mapBudgetRangeToSingleBudget(range: [number, number]): number {
-  const [min, max] = range
-  const midpoint = Math.round((min + max) / 2)
-  return Math.max(1, midpoint)
+export function mapBudgetFromBudgetRangeUpperBound(range: [number, number]): number {
+  return range[1]
 }
 
 /**
@@ -122,9 +100,9 @@ export function buildCustomerProfilePayload(
     sizeCompany: profileData.companySize.trim(),
     industry: profileData.industry.trim(),
     typeSpecialists: [...profileData.freelancerTypes],
-    budget: mapBudgetRangeToSingleBudget(settingsData.budgetRange),
+    budget: mapBudgetFromBudgetRangeUpperBound(settingsData.budgetRange),
     hiringFrequency: mapHiringFrequency(settingsData.hiringFrequency),
-    preferenceLevelExperience: mapLevelExperience(settingsData.experienceLevels),
+    preferenceLevelExperience: mapLevelExperience(settingsData.experienceLevel),
   }
 }
 

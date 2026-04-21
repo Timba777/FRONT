@@ -13,17 +13,24 @@ export interface ClientSignupAccountSnapshot {
 /**
  * Code-ready body for `POST /user-profile/create-customer` after registration + CUSTOMER session.
  *
- * Call site (recommended): `components/client-signup/client-signup-wizard.tsx` inside `handleSubmit`,
- * after successful `register` + `checkAuth`, **before** or **after** email-confirmation UX — product decision.
- * Do not call until session exists and user role is `CUSTOMER`.
+ * Payload shape (backend):
+ * `{ "customerProfile": { ... }, "userProfile": { ... } }` — `userProfile` may be `{}` if nothing to patch.
+ *
+ * **When to send:** only after **step 3 (Настройки)** is complete — `customerProfile` needs both
+ * step 2 (company / industry / specialists) and step 3 (budget / hiring / experience). Do **not** call
+ * right after leaving step 2; the natural place is the same flow as final submit (e.g. after `register` +
+ * `checkAuth` in `handleSubmit`), once you explicitly decide to wire `createFullCustomerProfile`.
+ *
+ * Do not call `createFullCustomerProfile` until product explicitly enables it (session + CUSTOMER role required).
  */
 export function buildCreateFullCustomerProfileAfterClientSignup(
   account: ClientSignupAccountSnapshot,
   profileData: ClientSignupProfileData,
   settingsData: ClientSignupSettingsData
 ): CreateFullCustomerProfileDto {
+  const userProfile = buildUpdateUserProfileFromFullName(account.fullName)
   return {
     customerProfile: buildCustomerProfilePayload(profileData, settingsData),
-    userProfile: buildUpdateUserProfileFromFullName(account.fullName),
+    userProfile,
   }
 }

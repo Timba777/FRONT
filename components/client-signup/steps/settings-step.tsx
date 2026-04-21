@@ -1,15 +1,14 @@
 "use client"
 
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/utils"
 
-interface SettingsData {
+export interface SettingsData {
   budgetRange: [number, number]
   hiringFrequency: string
-  experienceLevels: string[]
+  experienceLevel: string
   notifyTopMatches: boolean
   sendWeeklySummary: boolean
   autoInviteHighMatches: boolean
@@ -45,13 +44,6 @@ const formatBudget = (value: number) => {
 export function SettingsStep({ data, onChange, errors, touched, onBlur }: SettingsStepProps) {
   const handleChange = <K extends keyof SettingsData>(field: K, value: SettingsData[K]) => {
     onChange({ ...data, [field]: value })
-  }
-
-  const toggleExperienceLevel = (level: string) => {
-    const newLevels = data.experienceLevels.includes(level)
-      ? data.experienceLevels.filter((l) => l !== level)
-      : [...data.experienceLevels, level]
-    handleChange("experienceLevels", newLevels)
   }
 
   const getBudgetDisplay = () => {
@@ -117,25 +109,34 @@ export function SettingsStep({ data, onChange, errors, touched, onBlur }: Settin
         )}
       </div>
 
-      {/* Experience Levels */}
+      {/* Experience level (single choice) */}
       <div className="space-y-3">
         <Label className="text-sm font-medium">
-          Предпочтительный уровень опыта
+          Предпочтительный уровень опыта <span className="text-destructive">*</span>
         </Label>
-        <div className="space-y-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {experienceOptions.map((exp) => (
-            <label
+            <button
               key={exp.value}
-              className="flex items-center gap-3 cursor-pointer"
+              type="button"
+              onClick={() => {
+                handleChange("experienceLevel", exp.value)
+                onBlur("experienceLevel")
+              }}
+              className={cn(
+                "rounded-lg border px-4 py-3 text-sm font-medium transition-all",
+                data.experienceLevel === exp.value
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
+              )}
             >
-              <Checkbox
-                checked={data.experienceLevels.includes(exp.value)}
-                onCheckedChange={() => toggleExperienceLevel(exp.value)}
-              />
-              <span className="text-sm">{exp.label}</span>
-            </label>
+              {exp.label}
+            </button>
           ))}
         </div>
+        {touched.experienceLevel && errors.experienceLevel && (
+          <p className="text-sm text-destructive">{errors.experienceLevel}</p>
+        )}
       </div>
 
       {/* AI Settings */}
@@ -143,7 +144,7 @@ export function SettingsStep({ data, onChange, errors, touched, onBlur }: Settin
         <h3 className="text-base font-semibold text-foreground">
           Настройки ИИ для подбора
         </h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label htmlFor="notifyTopMatches" className="text-sm font-normal text-foreground cursor-pointer">

@@ -13,7 +13,7 @@ import { useAuth } from "@/context/auth-context"
 import { UserRole } from "@/types/user-role.enum"
 import { AccountStep } from "./steps/account-step"
 import { ProfileStep } from "./steps/profile-step"
-import { SettingsStep } from "./steps/settings-step"
+import { SettingsStep, type SettingsData } from "./steps/settings-step"
 
 const steps = [
   { id: 1, label: "Аккаунт" },
@@ -34,15 +34,6 @@ interface ProfileData {
   industry: string
   freelancerTypes: string[]
   howHeard: string
-}
-
-interface SettingsData {
-  budgetRange: [number, number]
-  hiringFrequency: string
-  experienceLevels: string[]
-  notifyTopMatches: boolean
-  sendWeeklySummary: boolean
-  autoInviteHighMatches: boolean
 }
 
 export function ClientSignupWizard() {
@@ -80,7 +71,7 @@ export function ClientSignupWizard() {
   const [settingsData, setSettingsData] = useState<SettingsData>({
     budgetRange: [20, 100],
     hiringFrequency: "",
-    experienceLevels: ["beginner", "intermediate"],
+    experienceLevel: "intermediate",
     notifyTopMatches: true,
     sendWeeklySummary: true,
     autoInviteHighMatches: true,
@@ -130,6 +121,9 @@ export function ClientSignupWizard() {
 
     if (!settingsData.hiringFrequency) {
       errors.hiringFrequency = "Выберите частоту найма"
+    }
+    if (!settingsData.experienceLevel) {
+      errors.experienceLevel = "Выберите уровень опыта"
     }
 
     return errors
@@ -249,6 +243,7 @@ export function ClientSignupWizard() {
       setSettingsErrors(errors)
       setSettingsTouched({
         hiringFrequency: true,
+        experienceLevel: true,
       })
       return
     }
@@ -269,7 +264,9 @@ export function ClientSignupWizard() {
         role: UserRole.CUSTOMER,
       })
       await checkAuth()
-      // Customer profile payload + API: `api/integration/post-register-customer-profile.ts`, `services/user-profile.ts`
+      // Full `CreateFullCustomerProfileDto` (customerProfile + userProfile) belongs after step 3 when
+      // profile + settings exist — not after step 2. Integration: `api/integration/post-register-customer-profile.ts`.
+      // Do not call `createFullCustomerProfile` here without an explicit product decision (see that file).
       setRegisteredEmail(normalizedEmail)
       setIsConfirmationDialogOpen(true)
     } catch (error) {
