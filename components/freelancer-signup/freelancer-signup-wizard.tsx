@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "@/components/login/social-login-button"
 import { EmailConfirmationDialog } from "@/components/auth/email-confirmation-dialog"
+import { UserAlreadyExistsModal } from "@/components/auth/user-already-exists-modal"
+import { isUserAlreadyExistsError } from "@/api/helpers/is-user-already-exists-error"
 import { Stepper } from "./stepper"
 import { AccountStep } from "./steps/account-step"
 import { ProfileStep } from "./steps/profile-step"
@@ -46,6 +48,8 @@ export function FreelancerSignupWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState("")
+  const [submitError, setSubmitError] = useState("")
+  const [showUserExistsModal, setShowUserExistsModal] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right")
   const contentRef = useRef<HTMLDivElement>(null)
@@ -235,6 +239,8 @@ export function FreelancerSignupWizard() {
   }
 
   const handleSubmit = async () => {
+    setSubmitError("")
+    setShowUserExistsModal(false)
     setIsSubmitting(true)
 
     try {
@@ -253,8 +259,18 @@ export function FreelancerSignupWizard() {
       await checkAuth()
       setRegisteredEmail(normalizedEmail)
       setIsConfirmationDialogOpen(true)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Freelancer registration failed:", error)
+      if (isUserAlreadyExistsError(error)) {
+        setShowUserExistsModal(true)
+        setSubmitError("")
+      } else {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Не удалось завершить регистрацию. Попробуйте позже."
+        setSubmitError(message)
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -411,6 +427,12 @@ export function FreelancerSignupWizard() {
           )}
         </div>
 
+        {currentStep === 4 && submitError ? (
+          <p className="mt-3 text-center text-sm text-destructive" role="alert">
+            {submitError}
+          </p>
+        ) : null}
+
         {/* Social Login - Only on first step */}
         {currentStep === 1 && (
           <>
@@ -488,6 +510,10 @@ export function FreelancerSignupWizard() {
         email={registeredEmail}
         onClose={() => setIsConfirmationDialogOpen(false)}
         onEditEmail={handleEditEmail}
+      />
+      <UserAlreadyExistsModal
+        open={showUserExistsModal}
+        onClose={() => setShowUserExistsModal(false)}
       />
     </main>
   )

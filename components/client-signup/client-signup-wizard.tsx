@@ -8,6 +8,8 @@ import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "@/components/login/social-login-button"
 import { Stepper } from "@/components/freelancer-signup/stepper"
 import { EmailConfirmationDialog } from "@/components/auth/email-confirmation-dialog"
+import { UserAlreadyExistsModal } from "@/components/auth/user-already-exists-modal"
+import { isUserAlreadyExistsError } from "@/api/helpers/is-user-already-exists-error"
 import { register } from "@/services/auth"
 import { useAuth } from "@/context/auth-context"
 import { UserRole } from "@/types/user-role.enum"
@@ -42,6 +44,8 @@ export function ClientSignupWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState("")
+  const [submitError, setSubmitError] = useState("")
+  const [showUserExistsModal, setShowUserExistsModal] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right")
   const contentRef = useRef<HTMLDivElement>(null)
@@ -248,6 +252,8 @@ export function ClientSignupWizard() {
       return
     }
 
+    setSubmitError("")
+    setShowUserExistsModal(false)
     setIsSubmitting(true)
 
     try {
@@ -269,14 +275,17 @@ export function ClientSignupWizard() {
       // Do not call `createFullCustomerProfile` here without an explicit product decision (see that file).
       setRegisteredEmail(normalizedEmail)
       setIsConfirmationDialogOpen(true)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Client registration failed:", error)
-      const backendResponse = (error as any)?.originalError?.response
-      if (backendResponse) {
-        console.error("Client registration backend response:", {
-          status: backendResponse.status,
-          data: backendResponse.data,
-        })
+      if (isUserAlreadyExistsError(error)) {
+        setShowUserExistsModal(true)
+        setSubmitError("")
+      } else {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Не удалось завершить регистрацию. Попробуйте позже."
+        setSubmitError(message)
       }
     } finally {
       setIsSubmitting(false)
@@ -420,6 +429,12 @@ export function ClientSignupWizard() {
           )}
         </div>
 
+        {currentStep === 3 && submitError ? (
+          <p className="mt-3 text-center text-sm text-destructive" role="alert">
+            {submitError}
+          </p>
+        ) : null}
+
         {/* Social Login - Only on first step */}
         {currentStep === 1 && (
           <>
@@ -497,6 +512,10 @@ export function ClientSignupWizard() {
         email={registeredEmail}
         onClose={() => setIsConfirmationDialogOpen(false)}
         onEditEmail={handleEditEmail}
+      />
+      <UserAlreadyExistsModal
+        open={showUserExistsModal}
+        onClose={() => setShowUserExistsModal(false)}
       />
     </main>
   )
