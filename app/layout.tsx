@@ -46,9 +46,9 @@ export default function RootLayout({
         <meta name="author" content="Light Team" />
         <meta name="robots" content="noarchive" />
         
-        <link rel="canonical" href="https://lightfreelance.ru" />
+        <link rel="canonical" href="https://lightfreelance.ru"/>
       
-        <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="/images/logo.svg"/>
         
         <meta property="og:title" content="Light — Фриланс биржа нового поколения" />
         <meta property="og:description" content="Работайте без комиссий, получайте быстрые выплаты и находите лучшие заказы. Light меняет правила игры на рынке фриланса." />
