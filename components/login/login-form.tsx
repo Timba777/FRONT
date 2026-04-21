@@ -218,6 +218,7 @@ export function LoginForm() {
             }
             provider="Google"
             onClick={() => router.push("/register")}
+            disabled = {true}
           />
           <SocialLoginButton
             icon={
@@ -227,6 +228,7 @@ export function LoginForm() {
             }
             provider="LinkedIn"
             onClick={() => router.push("/register")}
+            disabled = {true}
           />
           <SocialLoginButton
             icon={
@@ -236,6 +238,7 @@ export function LoginForm() {
             }
             provider="Apple"
             onClick={() => router.push("/register")}
+            disabled = {true}
           />
         </div>
 

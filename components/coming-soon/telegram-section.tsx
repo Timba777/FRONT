@@ -16,7 +16,7 @@ export function TelegramSection() {
               className="h-full w-full object-contain"
             />
           </div>
-          <span className="mt-2 text-xs text-primary">@light_freelance</span>
+          <span className="mt-2 text-xs text-primary">@LightFreelancee</span>
         </div>
 
         {/* Content */}
