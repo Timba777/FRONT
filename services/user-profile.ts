@@ -1,12 +1,12 @@
-import { userProfileApi } from "@/api/services/user-profile.api"
-import type { CreateFullCustomerProfileDto } from "@/api/dto/profile/create-full-customer-profile.dto"
-
-export const updateProfileImage = async (file: File) => {
-  return userProfileApi.updateProfileImage(file)
-}
-
-export const createFullCustomerProfile = async (data: CreateFullCustomerProfileDto) => {
-  return userProfileApi.createFullCustomerProfile(data)
-}
-
-export { userProfileApi }
+/**
+ * Backward-compatible shim — prefer `services/profile` (same as `auth` → `services/auth`).
+ */
+export {
+  profileApi as userProfileApi,
+  getMyProfile,
+  createFullCustomerProfile,
+  updateFullCustomerProfile,
+  createFullMasterProfile,
+  updateFullMasterProfile,
+  updateProfileImage,
+} from "./profile"

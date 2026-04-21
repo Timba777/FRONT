@@ -272,7 +272,7 @@ export function ClientSignupWizard() {
       await checkAuth()
       // Full `CreateFullCustomerProfileDto` (customerProfile + userProfile) belongs after step 3 when
       // profile + settings exist — not after step 2. Integration: `api/integration/post-register-customer-profile.ts`.
-      // Do not call `createFullCustomerProfile` here without an explicit product decision (see that file).
+      // Do not call `createFullCustomerProfile` here without an explicit product decision (`services/profile.ts`).
       setRegisteredEmail(normalizedEmail)
       setIsConfirmationDialogOpen(true)
     } catch (error: unknown) {

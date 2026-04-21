@@ -21,7 +21,7 @@ export interface ClientSignupAccountSnapshot {
  * right after leaving step 2; the natural place is the same flow as final submit (e.g. after `register` +
  * `checkAuth` in `handleSubmit`), once you explicitly decide to wire `createFullCustomerProfile`.
  *
- * Do not call `createFullCustomerProfile` until product explicitly enables it (session + CUSTOMER role required).
+ * Do not call `createFullCustomerProfile` (`services/profile.ts`) until product explicitly enables it (session + CUSTOMER role required).
  */
 export function buildCreateFullCustomerProfileAfterClientSignup(
   account: ClientSignupAccountSnapshot,
