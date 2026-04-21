@@ -445,6 +445,7 @@ export function FreelancerSignupWizard() {
                   </svg>
                 }
                 provider="Google"
+                disabled = {true}
               />
               <SocialLoginButton
                 icon={
@@ -453,6 +454,7 @@ export function FreelancerSignupWizard() {
                   </svg>
                 }
                 provider="LinkedIn"
+                disabled = {true}
               />
             </div>
           </>

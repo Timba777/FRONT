@@ -456,6 +456,7 @@ export function ClientSignupWizard() {
                   </svg>
                 }
                 provider="Google"
+                disabled = {true}
               />
               <SocialLoginButton
                 icon={
@@ -464,6 +465,7 @@ export function ClientSignupWizard() {
                   </svg>
                 }
                 provider="LinkedIn"
+                disabled = {true}
               />
             </div>
           </>

@@ -109,6 +109,7 @@ export function AccountStep({ data, onChange, errors, touched, onBlur }: Account
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
             aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+          
           >
             {showPassword ? (
               <EyeOff className="h-5 w-5" />
