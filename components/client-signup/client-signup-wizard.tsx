@@ -269,6 +269,7 @@ export function ClientSignupWizard() {
         role: UserRole.CUSTOMER,
       })
       await checkAuth()
+      // Customer profile payload + API: `api/integration/post-register-customer-profile.ts`, `services/user-profile.ts`
       setRegisteredEmail(normalizedEmail)
       setIsConfirmationDialogOpen(true)
     } catch (error) {

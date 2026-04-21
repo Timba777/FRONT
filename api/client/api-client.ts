@@ -4,6 +4,7 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
+  type RawAxiosRequestHeaders,
 } from "axios"
 import { API_CONFIG } from "@/api/client/api-config"
 import { parseServerError } from "@/api/helpers/error-processing"
@@ -170,6 +171,45 @@ class ApiClient {
       url,
       data,
       config
+    )
+    return response.data
+  }
+
+  async patch<TResponse, TData = unknown>(
+    url: string,
+    data?: TData,
+    config?: AxiosRequestConfig
+  ): Promise<TResponse> {
+    const response: AxiosResponse<TResponse> = await this.instance.patch(
+      url,
+      data,
+      config
+    )
+    return response.data
+  }
+
+  /**
+   * PATCH with `multipart/form-data`. Do not pass JSON — use `FormData` only.
+   * Strips default JSON `Content-Type` so the runtime can set the multipart boundary.
+   */
+  async patchFormData<TResponse>(
+    url: string,
+    formData: FormData,
+    config?: AxiosRequestConfig
+  ): Promise<TResponse> {
+    const mergedHeaders: RawAxiosRequestHeaders = {
+      ...(config?.headers as RawAxiosRequestHeaders | undefined),
+    }
+    delete mergedHeaders["Content-Type"]
+    delete mergedHeaders["content-type"]
+
+    const response: AxiosResponse<TResponse> = await this.instance.patch(
+      url,
+      formData,
+      {
+        ...config,
+        headers: mergedHeaders,
+      }
     )
     return response.data
   }
