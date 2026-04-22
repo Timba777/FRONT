@@ -8,12 +8,16 @@ import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "@/components/login/social-login-button"
 import { Stepper } from "@/components/freelancer-signup/stepper"
 import { EmailConfirmationDialog } from "@/components/auth/email-confirmation-dialog"
-import { register } from "@/services/auth"
-import { useAuth } from "@/context/auth-context"
+import { UserAlreadyExistsModal } from "@/components/auth/user-already-exists-modal"
+import { isUserAlreadyExistsError } from "@/api/helpers/is-user-already-exists-error"
+import { isProfileAlreadyExistsError } from "@/api/helpers/is-profile-already-exists-error"
+import { buildCreateFullCustomerProfileAfterClientSignup } from "@/api/integration/post-register-customer-profile"
+import { login, register } from "@/services/auth"
+import { createFullCustomerProfile } from "@/services/profile"
 import { UserRole } from "@/types/user-role.enum"
 import { AccountStep } from "./steps/account-step"
 import { ProfileStep } from "./steps/profile-step"
-import { SettingsStep } from "./steps/settings-step"
+import { SettingsStep, type SettingsData } from "./steps/settings-step"
 
 const steps = [
   { id: 1, label: "Аккаунт" },
@@ -36,24 +40,19 @@ interface ProfileData {
   howHeard: string
 }
 
-interface SettingsData {
-  budgetRange: [number, number]
-  hiringFrequency: string
-  experienceLevels: string[]
-  notifyTopMatches: boolean
-  sendWeeklySummary: boolean
-  autoInviteHighMatches: boolean
-}
-
 export function ClientSignupWizard() {
-  const { checkAuth } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState("")
+  const [submitError, setSubmitError] = useState("")
+  const [showUserExistsModal, setShowUserExistsModal] = useState(false)
+  const [isAccountRegistered, setIsAccountRegistered] = useState(false)
+  const [isProfileCreated, setIsProfileCreated] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right")
   const contentRef = useRef<HTMLDivElement>(null)
+  const isFinalProfileRequestInFlight = useRef(false)
 
   // Account Step State
   const [accountData, setAccountData] = useState<AccountData>({
@@ -80,7 +79,7 @@ export function ClientSignupWizard() {
   const [settingsData, setSettingsData] = useState<SettingsData>({
     budgetRange: [20, 100],
     hiringFrequency: "",
-    experienceLevels: ["beginner", "intermediate"],
+    experienceLevel: "intermediate",
     notifyTopMatches: true,
     sendWeeklySummary: true,
     autoInviteHighMatches: true,
@@ -130,6 +129,9 @@ export function ClientSignupWizard() {
 
     if (!settingsData.hiringFrequency) {
       errors.hiringFrequency = "Выберите частоту найма"
+    }
+    if (!settingsData.experienceLevel) {
+      errors.experienceLevel = "Выберите уровень опыта"
     }
 
     return errors
@@ -200,7 +202,7 @@ export function ClientSignupWizard() {
     }, 200)
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
       const errors = validateAccount()
       if (Object.keys(errors).length > 0) {
@@ -212,6 +214,48 @@ export function ClientSignupWizard() {
           agreeToTerms: true,
         })
         return
+      }
+
+      if (!isAccountRegistered) {
+        setSubmitError("")
+        setShowUserExistsModal(false)
+        setIsSubmitting(true)
+
+        try {
+          const normalizedName = accountData.fullName.trim()
+          const normalizedEmail = accountData.email.trim()
+
+          await register({
+            firstName: normalizedName,
+            name: normalizedName,
+            email: normalizedEmail,
+            password: accountData.password,
+            passwordRepeat: accountData.password,
+            passwordReapeat: accountData.password,
+            role: UserRole.CUSTOMER,
+          })
+
+          // Many backends only attach a session cookie on login, not on register.
+          // Same client + withCredentials; needed so create-customer is authorized later.
+          await login(normalizedEmail, accountData.password)
+
+          setIsAccountRegistered(true)
+          setRegisteredEmail(normalizedEmail)
+        } catch (error: unknown) {
+          if (isUserAlreadyExistsError(error)) {
+            setShowUserExistsModal(true)
+            return
+          }
+
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Не удалось завершить регистрацию. Попробуйте позже."
+          setSubmitError(message)
+          return
+        } finally {
+          setIsSubmitting(false)
+        }
       }
     }
 
@@ -249,39 +293,52 @@ export function ClientSignupWizard() {
       setSettingsErrors(errors)
       setSettingsTouched({
         hiringFrequency: true,
+        experienceLevel: true,
       })
       return
     }
 
-    setIsSubmitting(true)
+    if (!isAccountRegistered) {
+      setSubmitError("Сначала завершите шаг создания аккаунта.")
+      return
+    }
 
-    try {
-      const normalizedName = accountData.fullName.trim()
-      const normalizedEmail = accountData.email.trim()
-
-      await register({
-        firstName: normalizedName,
-        name: normalizedName,
-        email: normalizedEmail,
-        password: accountData.password,
-        passwordRepeat: accountData.password,
-        passwordReapeat: accountData.password,
-        role: UserRole.CUSTOMER,
-      })
-      await checkAuth()
-      setRegisteredEmail(normalizedEmail)
+    if (isProfileCreated) {
+      setSubmitError("")
       setIsConfirmationDialogOpen(true)
-    } catch (error) {
-      console.error("Client registration failed:", error)
-      const backendResponse = (error as any)?.originalError?.response
-      if (backendResponse) {
-        console.error("Client registration backend response:", {
-          status: backendResponse.status,
-          data: backendResponse.data,
-        })
+      return
+    }
+
+    if (isFinalProfileRequestInFlight.current) {
+      return
+    }
+
+    setSubmitError("")
+    isFinalProfileRequestInFlight.current = true
+    setIsSubmitting(true)
+    try {
+      const profilePayload = buildCreateFullCustomerProfileAfterClientSignup(
+        { fullName: accountData.fullName },
+        profileData,
+        settingsData
+      )
+      await createFullCustomerProfile(profilePayload)
+      setIsProfileCreated(true)
+      setIsConfirmationDialogOpen(true)
+    } catch (error: unknown) {
+      if (isProfileAlreadyExistsError(error)) {
+        setIsProfileCreated(true)
+        setIsConfirmationDialogOpen(true)
+      } else {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Не удалось сохранить профиль. Попробуйте позже."
+        setSubmitError(message)
       }
     } finally {
       setIsSubmitting(false)
+      isFinalProfileRequestInFlight.current = false
     }
   }
 
@@ -399,7 +456,7 @@ export function ClientSignupWizard() {
           {currentStep < 3 ? (
             <Button
               type="button"
-              onClick={handleNext}
+              onClick={() => void handleNext()}
               className="h-12 flex-1 rounded-lg text-base font-medium"
               disabled={!isStepValid() || isAnimating}
             >
@@ -409,7 +466,9 @@ export function ClientSignupWizard() {
           ) : (
             <Button
               type="button"
-              onClick={handleSubmit}
+              onClick={() => {
+                void handleSubmit()
+              }}
               className="h-12 flex-1 rounded-lg text-base font-medium"
               disabled={isSubmitting || isAnimating || !isStepValid()}
             >
@@ -421,6 +480,12 @@ export function ClientSignupWizard() {
             </Button>
           )}
         </div>
+
+        {currentStep === 3 && submitError ? (
+          <p className="mt-3 text-center text-sm text-destructive" role="alert">
+            {submitError}
+          </p>
+        ) : null}
 
         {/* Social Login - Only on first step */}
         {currentStep === 1 && (
@@ -499,6 +564,10 @@ export function ClientSignupWizard() {
         email={registeredEmail}
         onClose={() => setIsConfirmationDialogOpen(false)}
         onEditEmail={handleEditEmail}
+      />
+      <UserAlreadyExistsModal
+        open={showUserExistsModal}
+        onClose={() => setShowUserExistsModal(false)}
       />
     </main>
   )
