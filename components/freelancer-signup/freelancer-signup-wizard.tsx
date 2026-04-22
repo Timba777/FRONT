@@ -9,14 +9,16 @@ import { SocialLoginButton } from "@/components/login/social-login-button"
 import { EmailConfirmationDialog } from "@/components/auth/email-confirmation-dialog"
 import { UserAlreadyExistsModal } from "@/components/auth/user-already-exists-modal"
 import { isUserAlreadyExistsError } from "@/api/helpers/is-user-already-exists-error"
+import { isProfileAlreadyExistsError } from "@/api/helpers/is-profile-already-exists-error"
+import { buildCreateFullMasterProfileAfterFreelancerSignup } from "@/api/integration/post-register-master-profile"
 import { Stepper } from "./stepper"
 import { AccountStep } from "./steps/account-step"
 import { ProfileStep } from "./steps/profile-step"
 import { SkillsStep } from "./steps/skills-step"
 import { PortfolioStep } from "./steps/portfolio-step"
 import type { PortfolioProject } from "./portfolio-builder"
-import { register } from "@/services/auth"
-import { useAuth } from "@/context/auth-context"
+import { login, register } from "@/services/auth"
+import { createFullMasterProfile } from "@/services/profile"
 import { UserRole } from "@/types/user-role.enum"
 
 const steps = [
@@ -43,16 +45,18 @@ interface ProfileData {
 }
 
 export function FreelancerSignupWizard() {
-  const { checkAuth } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState("")
   const [submitError, setSubmitError] = useState("")
   const [showUserExistsModal, setShowUserExistsModal] = useState(false)
+  const [isAccountRegistered, setIsAccountRegistered] = useState(false)
+  const [isProfileCreated, setIsProfileCreated] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right")
   const contentRef = useRef<HTMLDivElement>(null)
+  const isFinalProfileRequestInFlight = useRef(false)
 
   // Account Step State
   const [accountData, setAccountData] = useState<AccountData>({
@@ -187,7 +191,7 @@ export function FreelancerSignupWizard() {
     }, 200)
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
       const errors = validateAccount()
       if (Object.keys(errors).length > 0) {
@@ -199,6 +203,46 @@ export function FreelancerSignupWizard() {
           agreeToTerms: true,
         })
         return
+      }
+
+      if (!isAccountRegistered) {
+        setSubmitError("")
+        setShowUserExistsModal(false)
+        setIsSubmitting(true)
+
+        try {
+          const normalizedName = accountData.fullName.trim()
+          const normalizedEmail = accountData.email.trim()
+
+          await register({
+            firstName: normalizedName,
+            name: normalizedName,
+            email: normalizedEmail,
+            password: accountData.password,
+            passwordRepeat: accountData.password,
+            passwordReapeat: accountData.password,
+            role: UserRole.MASTER,
+          })
+
+          await login(normalizedEmail, accountData.password)
+
+          setIsAccountRegistered(true)
+          setRegisteredEmail(normalizedEmail)
+        } catch (error: unknown) {
+          if (isUserAlreadyExistsError(error)) {
+            setShowUserExistsModal(true)
+            return
+          }
+
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Не удалось завершить регистрацию. Попробуйте позже."
+          setSubmitError(message)
+          return
+        } finally {
+          setIsSubmitting(false)
+        }
       }
     }
 
@@ -212,6 +256,8 @@ export function FreelancerSignupWizard() {
         })
         return
       }
+
+      // Profile save is triggered by final submit.
     }
 
     if (currentStep === 3) {
@@ -220,6 +266,8 @@ export function FreelancerSignupWizard() {
         setSkillsError(error)
         return
       }
+
+      // Skills step only validates data; no profile request here.
     }
 
     animateTransition("right", () => {
@@ -239,40 +287,53 @@ export function FreelancerSignupWizard() {
   }
 
   const handleSubmit = async () => {
+    if (!isAccountRegistered) {
+      setSubmitError("Сначала завершите шаг создания аккаунта.")
+      return
+    }
+
+    const skillsValidationError = validateSkills()
+    if (skillsValidationError) {
+      setSkillsError(skillsValidationError)
+      return
+    }
+
+    if (isProfileCreated) {
+      setSubmitError("")
+      setIsConfirmationDialogOpen(true)
+      return
+    }
+
+    if (isFinalProfileRequestInFlight.current) {
+      return
+    }
+
     setSubmitError("")
-    setShowUserExistsModal(false)
+    isFinalProfileRequestInFlight.current = true
     setIsSubmitting(true)
-
     try {
-      const normalizedName = accountData.fullName.trim()
-      const normalizedEmail = accountData.email.trim()
-
-      await register({
-        firstName: normalizedName,
-        name: normalizedName,
-        email: normalizedEmail,
-        password: accountData.password,
-        passwordRepeat: accountData.password,
-        passwordReapeat: accountData.password,
-        role: UserRole.MASTER,
-      })
-      await checkAuth()
-      setRegisteredEmail(normalizedEmail)
+      const profilePayload = buildCreateFullMasterProfileAfterFreelancerSignup(
+        { fullName: accountData.fullName },
+        profileData,
+        { skills }
+      )
+      await createFullMasterProfile(profilePayload)
+      setIsProfileCreated(true)
       setIsConfirmationDialogOpen(true)
     } catch (error: unknown) {
-      console.error("Freelancer registration failed:", error)
-      if (isUserAlreadyExistsError(error)) {
-        setShowUserExistsModal(true)
-        setSubmitError("")
+      if (isProfileAlreadyExistsError(error)) {
+        setIsProfileCreated(true)
+        setIsConfirmationDialogOpen(true)
       } else {
         const message =
           error instanceof Error
             ? error.message
-            : "Не удалось завершить регистрацию. Попробуйте позже."
+            : "Не удалось сохранить профиль. Попробуйте позже."
         setSubmitError(message)
       }
     } finally {
       setIsSubmitting(false)
+      isFinalProfileRequestInFlight.current = false
     }
   }
 
@@ -404,7 +465,7 @@ export function FreelancerSignupWizard() {
           {currentStep < 4 ? (
             <Button
               type="button"
-              onClick={handleNext}
+              onClick={() => void handleNext()}
               className="h-12 flex-1 rounded-lg text-base font-medium"
               disabled={!isStepValid() || isAnimating}
             >
@@ -414,7 +475,9 @@ export function FreelancerSignupWizard() {
           ) : (
             <Button
               type="button"
-              onClick={handleSubmit}
+              onClick={() => {
+                void handleSubmit()
+              }}
               className="h-12 flex-1 rounded-lg text-base font-medium"
               disabled={isSubmitting || isAnimating}
             >

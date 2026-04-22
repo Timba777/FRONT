@@ -13,5 +13,9 @@ export interface CreateMasterProfileDto {
   price?: number
   location?: string
   levelExperience: LevelExperience
-  typePrice: TypePrice
+  /**
+   * Backend supports this field, but UI control is not exposed in current wizard yet.
+   * Keep optional to avoid injecting fake defaults from frontend.
+   */
+  typePrice?: TypePrice
 }
