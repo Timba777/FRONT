@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -215,10 +215,17 @@ export function FreelancerSignupWizard() {
             role: UserRole.MASTER,
           })
 
-          await login(normalizedEmail, accountData.password)
+          try {
+            await login(normalizedEmail, accountData.password)
+          } catch (loginError) {
+
+            console.warn()
+
+          }
 
           setIsAccountRegistered(true)
           setRegisteredEmail(normalizedEmail)
+
         } catch (error: unknown) {
           if (isUserAlreadyExistsError(error)) {
             setShowUserExistsModal(true)
@@ -276,7 +283,7 @@ export function FreelancerSignupWizard() {
     setIsConfirmationDialogOpen(false)
     setCurrentStep(1)
   }
-
+  useEffect(() => {console.log(currentStep)},[currentStep])
   const handleSubmit = async () => {
     if (!isAccountRegistered) {
       setSubmitError("Сначала завершите шаг создания аккаунта.")

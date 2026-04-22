@@ -6,7 +6,7 @@ import axios, {
   InternalAxiosRequestConfig,
   type RawAxiosRequestHeaders,
 } from "axios"
-import { API_CONFIG, API_CONFIG_MULTIPART } from "@/api/client/api-config"
+import { API_CONFIG } from "@/api/client/api-config"
 import { parseServerError } from "@/api/helpers/error-processing"
 import type { ApiError } from "@/api/interfaces/api-error.interface"
 import type { ErrorResponse } from "@/api/interfaces/error-response.interface"
@@ -52,8 +52,6 @@ export function isApiError(error: unknown): error is ApiError {
 
 class ApiClient {
   public readonly instance: AxiosInstance
-  /** Без `Content-Type: application/json` — только для `FormData` (upload аватара и т.п.). */
-  private readonly formDataInstance: AxiosInstance
 
   constructor() {
     this.instance = axios.create({
@@ -63,27 +61,14 @@ class ApiClient {
       withCredentials: API_CONFIG.withCredentials,
     })
 
-    this.formDataInstance = axios.create({
-      baseURL: API_CONFIG_MULTIPART.baseURL,
-      timeout: API_CONFIG_MULTIPART.timeout,
-      withCredentials: API_CONFIG_MULTIPART.withCredentials,
-    })
-
-    this.setupInterceptors(this.instance)
-    this.setupInterceptors(this.formDataInstance)
+    this.setupInterceptors()
   }
 
-  private buildRequestUrlFor(
-    axiosInstance: AxiosInstance,
-    config: InternalAxiosRequestConfig
-  ): string {
+  private buildRequestUrl(config: InternalAxiosRequestConfig): string {
     try {
-      return axiosInstance.getUri(config)
+      return this.instance.getUri(config)
     } catch {
-      const base = (config.baseURL ?? axiosInstance.defaults.baseURL ?? "").replace(
-        /\/$/,
-        ""
-      )
+      const base = (config.baseURL ?? this.instance.defaults.baseURL ?? "").replace(/\/$/, "")
       const path = config.url ?? ""
       if (!base) return path || ""
       if (!path) return base
@@ -140,10 +125,9 @@ class ApiClient {
     })
   }
 
-  private setupInterceptors(axiosInstance: AxiosInstance) {
-    axiosInstance.interceptors.request.use(
+  private setupInterceptors() {
+    this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        // JSON default на основном instance ломает multipart; на formDataInstance JSON нет.
         if (config.data instanceof FormData && config.headers) {
           const h = config.headers as Record<string, false | string | undefined> & {
             set?: (name: string, value: string) => void
@@ -159,7 +143,7 @@ class ApiClient {
         }
 
         if (process.env.NODE_ENV !== "production") {
-          const uri = this.buildRequestUrlFor(axiosInstance, config)
+          const uri = this.buildRequestUrl(config)
           console.log(`📡 ${config.method?.toUpperCase() ?? "GET"} ${uri}`)
         }
 
@@ -168,7 +152,7 @@ class ApiClient {
       (error: unknown) => Promise.reject(this.normalizeFailure(error))
     )
 
-    axiosInstance.interceptors.response.use(
+    this.instance.interceptors.response.use(
       (response) => response,
       (error: unknown) => Promise.reject(this.normalizeFailure(error))
     )
@@ -220,7 +204,6 @@ class ApiClient {
 
   /**
    * PATCH with `multipart/form-data`. Do not pass JSON — use `FormData` only.
-   * Strips default JSON `Content-Type` so the runtime can set the multipart boundary.
    */
   async patchFormData<TResponse>(
     url: string,
@@ -233,7 +216,7 @@ class ApiClient {
     delete mergedHeaders["Content-Type"]
     delete mergedHeaders["content-type"]
 
-    const response: AxiosResponse<TResponse> = await this.formDataInstance.patch(
+    const response: AxiosResponse<TResponse> = await this.instance.patch(
       url,
       formData,
       {
@@ -247,9 +230,6 @@ class ApiClient {
     return response.data
   }
 
-  /**
-   * POST with `multipart/form-data` (some backends use POST for uploads instead of PATCH).
-   */
   async postFormData<TResponse>(
     url: string,
     formData: FormData,
@@ -261,7 +241,7 @@ class ApiClient {
     delete mergedHeaders["Content-Type"]
     delete mergedHeaders["content-type"]
 
-    const response: AxiosResponse<TResponse> = await this.formDataInstance.post(
+    const response: AxiosResponse<TResponse> = await this.instance.post(
       url,
       formData,
       {
