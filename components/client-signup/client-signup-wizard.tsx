@@ -235,7 +235,13 @@ export function ClientSignupWizard() {
             role: UserRole.CUSTOMER,
           })
 
-          await login(normalizedEmail, accountData.password)
+          try {
+            await login(normalizedEmail, accountData.password)
+          } catch (loginError) {
+
+            console.warn()
+
+          }
 
           setIsAccountRegistered(true)
           setRegisteredEmail(normalizedEmail)
