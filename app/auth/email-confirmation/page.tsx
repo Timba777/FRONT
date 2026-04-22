@@ -80,7 +80,7 @@ function EmailConfirmationContent() {
           <div className="space-y-4">
             <p className="text-sm text-destructive">{message}</p>
             <Button asChild>
-              <Link href="/">Перейти на главную</Link>
+              <Link href="/coming-soon">Перейти на главную</Link>
             </Button>
           </div>
         )}
