@@ -31,7 +31,7 @@ function mapExperienceToYears(value: string): number {
     case "10+":
       return 10
     default:
-      return 1
+      throw new Error("Невозможно определить опыт работы: выберите значение в шаге профиля.")
   }
 }
 
@@ -46,7 +46,7 @@ function mapExperienceToLevel(value: string): LevelExperience {
     case "10+":
       return LevelExperience.Эксперт
     default:
-      return LevelExperience.Средний
+      throw new Error("Невозможно определить уровень опыта: выберите значение в шаге профиля.")
   }
 }
 
@@ -55,18 +55,30 @@ export function buildCreateFullMasterProfileAfterFreelancerSignup(
   profile: FreelancerSignupProfileSnapshot,
   skillsData: FreelancerSignupSkillsSnapshot
 ): CreateFullMasterProfileDto {
-  const specialization = profile.profileTitle.trim() || "Фрилансер"
-  const descriptionProfile = profile.description.trim() || specialization
+  const specialization = profile.profileTitle.trim()
+  if (!specialization) {
+    throw new Error("Укажите заголовок профиля перед созданием профиля мастера.")
+  }
+
+  const descriptionProfile = profile.description.trim()
+  if (!descriptionProfile) {
+    throw new Error("Укажите описание профиля перед созданием профиля мастера.")
+  }
+
+  const location = profile.location.trim()
+  const cleanedSkills = skillsData.skills
+    .map((skill) => skill.trim())
+    .filter((skill) => skill.length > 0)
 
   return {
     masterProfile: {
       specialization,
       experienceYears: mapExperienceToYears(profile.experience),
       descriptionProfile,
-      skills: skillsData.skills,
-      location: profile.location.trim() || undefined,
+      skills: cleanedSkills.length > 0 ? cleanedSkills : undefined,
+      location: location.length > 0 ? location : undefined,
       levelExperience: mapExperienceToLevel(profile.experience),
-      // Default price mode until dedicated UI field is introduced.
+      // Backend validates enum; wizard has no control yet — hourly is a safe default.
       typePrice: TypePrice.Почасовая,
     },
     userProfile: buildUpdateUserProfileFromFullName(account.fullName),

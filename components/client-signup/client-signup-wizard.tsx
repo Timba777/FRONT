@@ -10,8 +10,9 @@ import { Stepper } from "@/components/freelancer-signup/stepper"
 import { EmailConfirmationDialog } from "@/components/auth/email-confirmation-dialog"
 import { UserAlreadyExistsModal } from "@/components/auth/user-already-exists-modal"
 import { isUserAlreadyExistsError } from "@/api/helpers/is-user-already-exists-error"
+import { isProfileAlreadyExistsError } from "@/api/helpers/is-profile-already-exists-error"
 import { buildCreateFullCustomerProfileAfterClientSignup } from "@/api/integration/post-register-customer-profile"
-import { register } from "@/services/auth"
+import { login, register } from "@/services/auth"
 import { createFullCustomerProfile } from "@/services/profile"
 import { UserRole } from "@/types/user-role.enum"
 import { AccountStep } from "./steps/account-step"
@@ -47,9 +48,11 @@ export function ClientSignupWizard() {
   const [submitError, setSubmitError] = useState("")
   const [showUserExistsModal, setShowUserExistsModal] = useState(false)
   const [isAccountRegistered, setIsAccountRegistered] = useState(false)
+  const [isProfileCreated, setIsProfileCreated] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right")
   const contentRef = useRef<HTMLDivElement>(null)
+  const isFinalProfileRequestInFlight = useRef(false)
 
   // Account Step State
   const [accountData, setAccountData] = useState<AccountData>({
@@ -232,9 +235,12 @@ export function ClientSignupWizard() {
             role: UserRole.CUSTOMER,
           })
 
+          // Many backends only attach a session cookie on login, not on register.
+          // Same client + withCredentials; needed so create-customer is authorized later.
+          await login(normalizedEmail, accountData.password)
+
           setIsAccountRegistered(true)
           setRegisteredEmail(normalizedEmail)
-          setIsConfirmationDialogOpen(true)
         } catch (error: unknown) {
           if (isUserAlreadyExistsError(error)) {
             setShowUserExistsModal(true)
@@ -292,8 +298,24 @@ export function ClientSignupWizard() {
       return
     }
 
-    setIsSubmitting(true)
+    if (!isAccountRegistered) {
+      setSubmitError("Сначала завершите шаг создания аккаунта.")
+      return
+    }
 
+    if (isProfileCreated) {
+      setSubmitError("")
+      setIsConfirmationDialogOpen(true)
+      return
+    }
+
+    if (isFinalProfileRequestInFlight.current) {
+      return
+    }
+
+    setSubmitError("")
+    isFinalProfileRequestInFlight.current = true
+    setIsSubmitting(true)
     try {
       const profilePayload = buildCreateFullCustomerProfileAfterClientSignup(
         { fullName: accountData.fullName },
@@ -301,15 +323,22 @@ export function ClientSignupWizard() {
         settingsData
       )
       await createFullCustomerProfile(profilePayload)
+      setIsProfileCreated(true)
+      setIsConfirmationDialogOpen(true)
     } catch (error: unknown) {
-      console.error("Client registration failed:", error)
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Не удалось завершить регистрацию. Попробуйте позже."
-      setSubmitError(message)
+      if (isProfileAlreadyExistsError(error)) {
+        setIsProfileCreated(true)
+        setIsConfirmationDialogOpen(true)
+      } else {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Не удалось сохранить профиль. Попробуйте позже."
+        setSubmitError(message)
+      }
     } finally {
       setIsSubmitting(false)
+      isFinalProfileRequestInFlight.current = false
     }
   }
 
@@ -437,7 +466,9 @@ export function ClientSignupWizard() {
           ) : (
             <Button
               type="button"
-              onClick={handleSubmit}
+              onClick={() => {
+                void handleSubmit()
+              }}
               className="h-12 flex-1 rounded-lg text-base font-medium"
               disabled={isSubmitting || isAnimating || !isStepValid()}
             >
