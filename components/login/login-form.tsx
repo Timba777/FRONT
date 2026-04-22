@@ -166,16 +166,6 @@ export function LoginForm() {
             )}
           </div>
 
-          {/* Forgot Password */}
-          <div className="flex justify-end">
-            <a
-              href="#"
-              className="text-sm text-foreground hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
-            >
-              Забыли пароль?
-            </a>
-          </div>
-
           {/* Submit Button */}
           <Button
             type="submit"

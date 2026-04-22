@@ -6,7 +6,7 @@ import axios, {
   InternalAxiosRequestConfig,
   type RawAxiosRequestHeaders,
 } from "axios"
-import { API_CONFIG } from "@/api/client/api-config"
+import { API_CONFIG, API_CONFIG_MULTIPART } from "@/api/client/api-config"
 import { parseServerError } from "@/api/helpers/error-processing"
 import type { ApiError } from "@/api/interfaces/api-error.interface"
 import type { ErrorResponse } from "@/api/interfaces/error-response.interface"
@@ -52,6 +52,8 @@ export function isApiError(error: unknown): error is ApiError {
 
 class ApiClient {
   public readonly instance: AxiosInstance
+  /** Без `Content-Type: application/json` — только для `FormData` (upload аватара и т.п.). */
+  private readonly formDataInstance: AxiosInstance
 
   constructor() {
     this.instance = axios.create({
@@ -61,14 +63,27 @@ class ApiClient {
       withCredentials: API_CONFIG.withCredentials,
     })
 
-    this.setupInterceptors()
+    this.formDataInstance = axios.create({
+      baseURL: API_CONFIG_MULTIPART.baseURL,
+      timeout: API_CONFIG_MULTIPART.timeout,
+      withCredentials: API_CONFIG_MULTIPART.withCredentials,
+    })
+
+    this.setupInterceptors(this.instance)
+    this.setupInterceptors(this.formDataInstance)
   }
 
-  private buildRequestUrl(config: InternalAxiosRequestConfig): string {
+  private buildRequestUrlFor(
+    axiosInstance: AxiosInstance,
+    config: InternalAxiosRequestConfig
+  ): string {
     try {
-      return this.instance.getUri(config)
+      return axiosInstance.getUri(config)
     } catch {
-      const base = (config.baseURL ?? this.instance.defaults.baseURL ?? "").replace(/\/$/, "")
+      const base = (config.baseURL ?? axiosInstance.defaults.baseURL ?? "").replace(
+        /\/$/,
+        ""
+      )
       const path = config.url ?? ""
       if (!base) return path || ""
       if (!path) return base
@@ -125,11 +140,26 @@ class ApiClient {
     })
   }
 
-  private setupInterceptors() {
-    this.instance.interceptors.request.use(
+  private setupInterceptors(axiosInstance: AxiosInstance) {
+    axiosInstance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
+        // JSON default на основном instance ломает multipart; на formDataInstance JSON нет.
+        if (config.data instanceof FormData && config.headers) {
+          const h = config.headers as Record<string, false | string | undefined> & {
+            set?: (name: string, value: string) => void
+            delete?: (name: string) => void
+          }
+          if (typeof h.delete === "function") {
+            h.delete("Content-Type")
+            h.delete("content-type")
+          } else {
+            h["Content-Type"] = false
+            h["content-type"] = false
+          }
+        }
+
         if (process.env.NODE_ENV !== "production") {
-          const uri = this.buildRequestUrl(config)
+          const uri = this.buildRequestUrlFor(axiosInstance, config)
           console.log(`📡 ${config.method?.toUpperCase() ?? "GET"} ${uri}`)
         }
 
@@ -138,7 +168,7 @@ class ApiClient {
       (error: unknown) => Promise.reject(this.normalizeFailure(error))
     )
 
-    this.instance.interceptors.response.use(
+    axiosInstance.interceptors.response.use(
       (response) => response,
       (error: unknown) => Promise.reject(this.normalizeFailure(error))
     )
@@ -203,11 +233,42 @@ class ApiClient {
     delete mergedHeaders["Content-Type"]
     delete mergedHeaders["content-type"]
 
-    const response: AxiosResponse<TResponse> = await this.instance.patch(
+    const response: AxiosResponse<TResponse> = await this.formDataInstance.patch(
       url,
       formData,
       {
+        maxBodyLength: Number.POSITIVE_INFINITY,
+        maxContentLength: Number.POSITIVE_INFINITY,
         ...config,
+        withCredentials: true,
+        headers: mergedHeaders,
+      }
+    )
+    return response.data
+  }
+
+  /**
+   * POST with `multipart/form-data` (some backends use POST for uploads instead of PATCH).
+   */
+  async postFormData<TResponse>(
+    url: string,
+    formData: FormData,
+    config?: AxiosRequestConfig
+  ): Promise<TResponse> {
+    const mergedHeaders: RawAxiosRequestHeaders = {
+      ...(config?.headers as RawAxiosRequestHeaders | undefined),
+    }
+    delete mergedHeaders["Content-Type"]
+    delete mergedHeaders["content-type"]
+
+    const response: AxiosResponse<TResponse> = await this.formDataInstance.post(
+      url,
+      formData,
+      {
+        maxBodyLength: Number.POSITIVE_INFINITY,
+        maxContentLength: Number.POSITIVE_INFINITY,
+        ...config,
+        withCredentials: true,
         headers: mergedHeaders,
       }
     )
