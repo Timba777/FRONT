@@ -50,8 +50,12 @@ function extractUser(payload: unknown): AuthUser | null {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const checkAuth = useCallback(async () => {
+    // Не проверяем авторизацию во время выхода
+    if (isLoggingOut) return
+    
     try {
       setLoading(true)
       const payload = await getMe()
@@ -61,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [isLoggingOut])
 
   const login = useCallback(async (email: string, password: string) => {
     try {
@@ -82,18 +86,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [checkAuth])
 
   const logout = useCallback(async () => {
+    setIsLoggingOut(true)
     try {
       setLoading(true)
       await logoutRequest()
+    } catch (error) {
+      console.error("Logout API error:", error)
     } finally {
       setUser(null)
       setLoading(false)
+      setIsLoggingOut(false)
     }
   }, [])
 
   useEffect(() => {
-    void checkAuth()
-  }, [checkAuth])
+    // Не проверяем авторизацию во время выхода
+    if (!isLoggingOut) {
+      void checkAuth()
+    }
+  }, [checkAuth, isLoggingOut])
 
   const value = useMemo<AuthContextValue>(() => ({
     user,
