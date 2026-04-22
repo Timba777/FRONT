@@ -47,11 +47,7 @@ class ProfileApi {
     }
   }
 
-  /**
-   * `PATCH` + `multipart/form-data`, поле **`file`**
-   * (`API_ENDPOINTS.PROFILE.UPDATE_IMAGE`). Запрос идёт через отдельный axios
-   * из `API_CONFIG_MULTIPART` / `formDataInstance` (см. `api-config.ts`, `api-client.ts`).
-   */
+  /** `PATCH` + `multipart/form-data`, поле `file` — `API_ENDPOINTS.PROFILE.UPDATE_IMAGE`. */
   async updateProfileImage(file: File) {
     if (!(file instanceof File)) {
       throw new TypeError("updateProfileImage: expected a File from the file input")
