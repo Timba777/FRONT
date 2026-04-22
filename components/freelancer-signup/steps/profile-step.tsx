@@ -1,7 +1,5 @@
 "use client"
 
-import { useRef } from "react"
-import { Camera, User } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -12,10 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { cn } from "@/lib/utils"
 
-interface ProfileData {
-  avatarUrl: string
+export interface ProfileData {
   profileTitle: string
   description: string
   location: string
@@ -39,64 +35,12 @@ const experienceOptions = [
 ]
 
 export function ProfileStep({ data, onChange, errors, touched, onBlur }: ProfileStepProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
   const handleChange = (field: keyof ProfileData, value: string) => {
     onChange({ ...data, [field]: value })
   }
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        handleChange("avatarUrl", reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
   return (
     <div className="space-y-5">
-      {/* Avatar Upload */}
-      <div className="flex flex-col items-center space-y-3">
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className={cn(
-            "relative h-24 w-24 overflow-hidden rounded-full border-2 border-dashed border-border transition-colors",
-            "hover:border-primary hover:bg-primary/5",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          )}
-        >
-          {data.avatarUrl ? (
-            <>
-              <img
-                src={data.avatarUrl}
-                alt="Загруженное фото профиля"
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 flex items-center justify-center bg-foreground/40 opacity-0 transition-opacity hover:opacity-100">
-                <Camera className="h-6 w-6 text-primary-foreground" />
-              </div>
-            </>
-          ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-1">
-              <User className="h-8 w-8 text-muted-foreground" />
-              <Camera className="h-4 w-4 text-muted-foreground" />
-            </div>
-          )}
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleAvatarUpload}
-        />
-        <p className="text-sm text-muted-foreground">Загрузите фото профиля</p>
-      </div>
-
       {/* Profile Title */}
       <div className="space-y-2">
         <Label htmlFor="profileTitle" className="text-sm font-medium">

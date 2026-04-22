@@ -48,14 +48,25 @@ class ProfileApi {
   }
 
   /**
-   * Avatar / title image. Backend: `PATCH /user-profile/update-image`, field name `file`.
+   * `PATCH` + `multipart/form-data`, поле **`file`**
+   * (`API_ENDPOINTS.PROFILE.UPDATE_IMAGE`). Запрос идёт через отдельный axios
+   * из `API_CONFIG_MULTIPART` / `formDataInstance` (см. `api-config.ts`, `api-client.ts`).
    */
   async updateProfileImage(file: File) {
+    if (!(file instanceof File)) {
+      throw new TypeError("updateProfileImage: expected a File from the file input")
+    }
+    if (file.size === 0) {
+      throw new Error("Пустой файл: выберите другое изображение.")
+    }
     const formData = new FormData()
-    formData.append("file", file)
+    formData.append("file", file, file.name)
 
     try {
-      return await apiClient.patchFormData(API_ENDPOINTS.PROFILE.UPDATE_IMAGE, formData)
+      return await apiClient.patchFormData(
+        API_ENDPOINTS.PROFILE.UPDATE_IMAGE,
+        formData
+      )
     } catch (err) {
       throw errorProcessing(err, "загрузке изображения профиля")
     }

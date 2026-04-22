@@ -13,7 +13,7 @@ import { isProfileAlreadyExistsError } from "@/api/helpers/is-profile-already-ex
 import { buildCreateFullMasterProfileAfterFreelancerSignup } from "@/api/integration/post-register-master-profile"
 import { Stepper } from "./stepper"
 import { AccountStep } from "./steps/account-step"
-import { ProfileStep } from "./steps/profile-step"
+import { ProfileStep, type ProfileData } from "./steps/profile-step"
 import { SkillsStep } from "./steps/skills-step"
 import { PortfolioStep } from "./steps/portfolio-step"
 import type { PortfolioProject } from "./portfolio-builder"
@@ -34,14 +34,6 @@ interface AccountData {
   email: string
   password: string
   agreeToTerms: boolean
-}
-
-interface ProfileData {
-  avatarUrl: string
-  profileTitle: string
-  description: string
-  location: string
-  experience: string
 }
 
 export function FreelancerSignupWizard() {
@@ -71,7 +63,6 @@ export function FreelancerSignupWizard() {
 
   // Profile Step State
   const [profileData, setProfileData] = useState<ProfileData>({
-    avatarUrl: "",
     profileTitle: "",
     description: "",
     location: "",
