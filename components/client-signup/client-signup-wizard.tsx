@@ -10,8 +10,9 @@ import { Stepper } from "@/components/freelancer-signup/stepper"
 import { EmailConfirmationDialog } from "@/components/auth/email-confirmation-dialog"
 import { UserAlreadyExistsModal } from "@/components/auth/user-already-exists-modal"
 import { isUserAlreadyExistsError } from "@/api/helpers/is-user-already-exists-error"
+import { buildCreateFullCustomerProfileAfterClientSignup } from "@/api/integration/post-register-customer-profile"
 import { register } from "@/services/auth"
-import { useAuth } from "@/context/auth-context"
+import { createFullCustomerProfile } from "@/services/profile"
 import { UserRole } from "@/types/user-role.enum"
 import { AccountStep } from "./steps/account-step"
 import { ProfileStep } from "./steps/profile-step"
@@ -39,13 +40,13 @@ interface ProfileData {
 }
 
 export function ClientSignupWizard() {
-  const { checkAuth } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState("")
   const [submitError, setSubmitError] = useState("")
   const [showUserExistsModal, setShowUserExistsModal] = useState(false)
+  const [isAccountRegistered, setIsAccountRegistered] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right")
   const contentRef = useRef<HTMLDivElement>(null)
@@ -198,7 +199,7 @@ export function ClientSignupWizard() {
     }, 200)
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
       const errors = validateAccount()
       if (Object.keys(errors).length > 0) {
@@ -210,6 +211,45 @@ export function ClientSignupWizard() {
           agreeToTerms: true,
         })
         return
+      }
+
+      if (!isAccountRegistered) {
+        setSubmitError("")
+        setShowUserExistsModal(false)
+        setIsSubmitting(true)
+
+        try {
+          const normalizedName = accountData.fullName.trim()
+          const normalizedEmail = accountData.email.trim()
+
+          await register({
+            firstName: normalizedName,
+            name: normalizedName,
+            email: normalizedEmail,
+            password: accountData.password,
+            passwordRepeat: accountData.password,
+            passwordReapeat: accountData.password,
+            role: UserRole.CUSTOMER,
+          })
+
+          setIsAccountRegistered(true)
+          setRegisteredEmail(normalizedEmail)
+          setIsConfirmationDialogOpen(true)
+        } catch (error: unknown) {
+          if (isUserAlreadyExistsError(error)) {
+            setShowUserExistsModal(true)
+            return
+          }
+
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Не удалось завершить регистрацию. Попробуйте позже."
+          setSubmitError(message)
+          return
+        } finally {
+          setIsSubmitting(false)
+        }
       }
     }
 
@@ -252,41 +292,22 @@ export function ClientSignupWizard() {
       return
     }
 
-    setSubmitError("")
-    setShowUserExistsModal(false)
     setIsSubmitting(true)
 
     try {
-      const normalizedName = accountData.fullName.trim()
-      const normalizedEmail = accountData.email.trim()
-
-      await register({
-        firstName: normalizedName,
-        name: normalizedName,
-        email: normalizedEmail,
-        password: accountData.password,
-        passwordRepeat: accountData.password,
-        passwordReapeat: accountData.password,
-        role: UserRole.CUSTOMER,
-      })
-      await checkAuth()
-      // Full `CreateFullCustomerProfileDto` (customerProfile + userProfile) belongs after step 3 when
-      // profile + settings exist — not after step 2. Integration: `api/integration/post-register-customer-profile.ts`.
-      // Do not call `createFullCustomerProfile` here without an explicit product decision (`services/profile.ts`).
-      setRegisteredEmail(normalizedEmail)
-      setIsConfirmationDialogOpen(true)
+      const profilePayload = buildCreateFullCustomerProfileAfterClientSignup(
+        { fullName: accountData.fullName },
+        profileData,
+        settingsData
+      )
+      await createFullCustomerProfile(profilePayload)
     } catch (error: unknown) {
       console.error("Client registration failed:", error)
-      if (isUserAlreadyExistsError(error)) {
-        setShowUserExistsModal(true)
-        setSubmitError("")
-      } else {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Не удалось завершить регистрацию. Попробуйте позже."
-        setSubmitError(message)
-      }
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Не удалось завершить регистрацию. Попробуйте позже."
+      setSubmitError(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -406,7 +427,7 @@ export function ClientSignupWizard() {
           {currentStep < 3 ? (
             <Button
               type="button"
-              onClick={handleNext}
+              onClick={() => void handleNext()}
               className="h-12 flex-1 rounded-lg text-base font-medium"
               disabled={!isStepValid() || isAnimating}
             >
