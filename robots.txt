@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /coming-soon
+Sitemap: https://lightfreelance.ru/sitemap.xml
+
+# Временно запрещаем несуществующие страницы
+Disallow: /orders
+Disallow: /freelancers
+Disallow: /categories
+Disallow: /register
+Disallow: /login
+Disallow: /about
+Disallow: /contacts
+Disallow: /admin/
+Disallow: /profile/
+Disallow: /cart/
+Disallow: /checkout/
