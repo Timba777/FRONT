@@ -235,8 +235,6 @@ export function ClientSignupWizard() {
             role: UserRole.CUSTOMER,
           })
 
-          // Many backends only attach a session cookie on login, not on register.
-          // Same client + withCredentials; needed so create-customer is authorized later.
           await login(normalizedEmail, accountData.password)
 
           setIsAccountRegistered(true)
