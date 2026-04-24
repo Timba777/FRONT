@@ -120,6 +120,9 @@ export function ClientSignupWizard() {
     if (profileData.freelancerTypes.length === 0) {
       errors.freelancerTypes = "Выберите хотя бы один тип фрилансеров"
     }
+    if (!profileData.companySize) {
+      errors.companySize = "Укажжите размер компании"
+    }
 
     return errors
   }, [profileData])

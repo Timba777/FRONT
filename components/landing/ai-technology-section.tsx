@@ -34,17 +34,30 @@ const freelancerMatches = [
 
 export function AITechnologySection() {
   return (
-    <section className="bg-secondary/30 py-16 sm:py-24">
+    <section 
+      className="bg-secondary/30 py-16 sm:py-24"
+      aria-labelledby="ai-technology-heading"
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left Content */}
           <div>
-            <Badge variant="secondary" className="mb-4 rounded-full px-3 py-1">
-              <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-primary" />
+            <Badge 
+              variant="secondary" 
+              className="mb-4 rounded-full px-3 py-1"
+              aria-label="Технология AI подбора"
+            >
+              <span 
+                className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-primary" 
+                aria-hidden="true"
+              />
               AI-Powered Matching
             </Badge>
             
-            <h2 className="text-pretty text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h2 
+              id="ai-technology-heading"
+              className="text-pretty text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+            >
               Технология, которая понимает ваши потребности
             </h2>
             
@@ -52,10 +65,13 @@ export function AITechnologySection() {
               Наш AI не просто подбирает ключевые слова. Он понимает контекст, оценивает портфолио и учитывает доступность, чтобы найти фрилансеров, которые действительно соответствуют требованиям вашего проекта.
             </p>
 
-            <ul className="mt-8 space-y-4">
-              {features.map((feature) => (
+            <ul className="mt-8 space-y-4" aria-label="Преимущества AI подбора">
+              {features.map((feature, index) => (
                 <li key={feature} className="flex items-start gap-3">
-                  <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10">
+                  <div 
+                    className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10"
+                    aria-hidden="true"
+                  >
                     <Check className="h-3.5 w-3.5 text-primary" />
                   </div>
                   <span className="text-sm text-foreground">{feature}</span>
@@ -66,27 +82,41 @@ export function AITechnologySection() {
 
           {/* Right Content - Freelancer Matches Card */}
           <div className="relative">
-            <Card className="overflow-hidden border-border/50 shadow-lg">
+            <Card 
+              className="overflow-hidden border-border/50 shadow-lg"
+              aria-label="Примеры подобранных фрилансеров"
+            >
               <CardContent className="p-0">
                 {/* Card Header */}
                 <div className="flex items-center justify-between border-b border-border/50 bg-muted/30 px-5 py-4">
                   <span className="text-sm font-medium text-foreground">
                     Лучшие варианты для вашего проекта
                   </span>
-                  <Badge variant="secondary" className="rounded-full text-xs">
+                  <Badge 
+                    variant="secondary" 
+                    className="rounded-full text-xs"
+                    aria-label="Найдено 3 фрилансера"
+                  >
                     3 найдено
                   </Badge>
                 </div>
 
                 {/* Freelancer List */}
-                <ul className="m-0 list-none divide-y divide-border/50 p-0">
+                <ul 
+                  className="m-0 list-none divide-y divide-border/50 p-0"
+                  aria-label="Список подобранных фрилансеров"
+                >
                   {freelancerMatches.map((freelancer) => (
                     <li
                       key={freelancer.name}
                       className="flex items-center gap-4 px-5 py-4"
+                      aria-label={`${freelancer.name}, ${freelancer.role}, ставка ${freelancer.rate}, совпадение ${freelancer.match}%`}
                     >
                       <Avatar className="h-12 w-12">
-                        <AvatarFallback className="bg-primary/10 text-primary">
+                        <AvatarFallback 
+                          className="bg-primary/10 text-primary"
+                          aria-label={`Аватар ${freelancer.name}`}
+                        >
                           {freelancer.name.split(" ").map(n => n[0]).join("")}
                         </AvatarFallback>
                       </Avatar>
@@ -104,10 +134,19 @@ export function AITechnologySection() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2">
-                        <Badge variant="outline" className="rounded-full text-xs font-medium text-primary">
+                        <Badge 
+                          variant="outline" 
+                          className="rounded-full text-xs font-medium text-primary"
+                          aria-label={`Совпадение ${freelancer.match} процентов`}
+                        >
                           {freelancer.match}% Match
                         </Badge>
-                        <Button variant="outline" size="sm" className="h-7 rounded-full text-xs">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-7 rounded-full text-xs"
+                          aria-label={`Посмотреть профиль ${freelancer.name}`}
+                        >
                           Посмотреть профиль
                         </Button>
                       </div>

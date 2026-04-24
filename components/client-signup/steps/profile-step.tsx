@@ -110,7 +110,7 @@ export function ProfileStep({ data, onChange, errors, touched, onBlur }: Profile
       {/* Company Size */}
       <div className="space-y-2">
         <Label htmlFor="companySize" className="text-sm font-medium">
-          Размер компании
+          Размер компании <span className="text-destructive">*</span>
         </Label>
         <Select
           value={data.companySize}
