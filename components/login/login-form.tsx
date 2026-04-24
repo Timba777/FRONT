@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Spinner } from "@/components/ui/spinner"
 import { SocialLoginButton } from "./social-login-button"
 import { useAuth } from "@/context/auth-context"
+import { EmailConfirmationDialog } from "@/components/auth/email-confirmation-dialog"
+import { isEmailNotVerifiedError } from "@/api/helpers/is-email-not-verified-error"
 
 export function LoginForm() {
   const router = useRouter()
@@ -20,6 +22,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const [touched, setTouched] = useState<{ email?: boolean; password?: boolean }>({})
 
@@ -74,7 +77,13 @@ export function LoginForm() {
     try {
       await login(email, password)
       router.push("/coming-soon")
-    } catch {
+    } catch (error: unknown) {
+      if (isEmailNotVerifiedError(error)) {
+        setIsConfirmationDialogOpen(true)
+        setTouched((prev) => ({ ...prev, password: false }))
+        return
+      }
+
       setErrors((prev) => ({
         ...prev,
         password: "Не удалось войти. Проверьте данные и попробуйте снова",
@@ -262,6 +271,13 @@ export function LoginForm() {
           </Label>
         </div>
       </div>
+      <EmailConfirmationDialog
+        open={isConfirmationDialogOpen}
+        email={email}
+        onClose={() => setIsConfirmationDialogOpen(false)}
+        onEditEmail={() => setIsConfirmationDialogOpen(false)}
+        editEmailLabel="Войти с другим email"
+      />
     </div>
   )
 }

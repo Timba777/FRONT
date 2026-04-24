@@ -16,6 +16,8 @@ interface EmailConfirmationDialogProps {
   email: string
   onClose: () => void
   onEditEmail: () => void
+  onResend?: (email: string) => Promise<void>
+  editEmailLabel?: string
 }
 
 export function EmailConfirmationDialog({
@@ -23,6 +25,8 @@ export function EmailConfirmationDialog({
   email,
   onClose,
   onEditEmail,
+  onResend,
+  editEmailLabel = "Изменить email адрес",
 }: EmailConfirmationDialogProps) {
   const [isResending, setIsResending] = useState(false)
   const [hint, setHint] = useState<string | null>(null)
@@ -30,6 +34,12 @@ export function EmailConfirmationDialog({
   const handleResend = async () => {
     setIsResending(true)
     try {
+      if (onResend) {
+        await onResend(email)
+        setHint("Письмо отправлено повторно. Проверьте папку «Входящие» и «Спам».")
+        return
+      }
+
       // TODO: Call resend confirmation endpoint when backend provides it.
       setHint("Повторная отправка пока недоступна. Проверьте папку «Спам».")
     } finally {
@@ -53,7 +63,7 @@ export function EmailConfirmationDialog({
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onEditEmail}>
-            Изменить email адрес
+            {editEmailLabel}
           </Button>
           <Button type="button" variant="secondary" onClick={handleResend} disabled={isResending}>
             {isResending ? "Отправка..." : "Отправить повторно"}
