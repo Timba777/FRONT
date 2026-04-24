@@ -26,7 +26,7 @@ export default function ComingSoonPage() {
     try {
       await authLogout() // Это очистит состояние и установит loading
       // Используем window.location для полного сброса состояния
-      window.location.href = "/"
+      window.location.href = "/login"
     } catch (error) {
       console.error("Logout error:", error)
       // Даже если API вернул ошибку, очищаем локальное состояние

@@ -47,7 +47,7 @@ export function Header() {
             <Link href="/register">Регистрация</Link>
           </Button>
           <Button className="rounded-full px-5" asChild>
-            <Link href="/">Войти</Link>
+            <Link href="/login">Войти</Link>
           </Button>
         </div>
 
