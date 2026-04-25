@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Sparkles } from "lucide-react"
@@ -78,8 +78,15 @@ export function LoginForm() {
       await login(email, password)
       router.push("/coming-soon")
     } catch (error: unknown) {
+      console.log(`Login err - ${error}`)
+      console.log(isEmailNotVerifiedError(error))
       if (isEmailNotVerifiedError(error)) {
+        console.log('Opening dialog, current state:', isConfirmationDialogOpen)
         setIsConfirmationDialogOpen(true)
+        console.log('New state should be true')
+        setTimeout(() => {
+          console.log('After 0ms, isConfirmationDialogOpen =', isConfirmationDialogOpen)
+        }, 0)
         setTouched((prev) => ({ ...prev, password: false }))
         return
       }
@@ -93,7 +100,7 @@ export function LoginForm() {
       setIsLoading(false)
     }
   }
-
+  useEffect(() => {console.log(`isConfirmationDialogOpen - ${isConfirmationDialogOpen}`)},[isConfirmationDialogOpen])
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="mx-auto w-full max-w-md">
@@ -271,13 +278,14 @@ export function LoginForm() {
           </Label>
         </div>
       </div>
-      <EmailConfirmationDialog
-        open={isConfirmationDialogOpen}
-        email={email}
-        onClose={() => setIsConfirmationDialogOpen(false)}
-        onEditEmail={() => setIsConfirmationDialogOpen(false)}
-        editEmailLabel="Войти с другим email"
-      />
+          <EmailConfirmationDialog
+            key="email-confirmation-dialog"
+            open={isConfirmationDialogOpen}
+            email={email}
+            onClose={() => setIsConfirmationDialogOpen(false)}
+            onEditEmail={() => setIsConfirmationDialogOpen(false)}
+            editEmailLabel="Войти с другим email"
+          />
     </div>
   )
 }

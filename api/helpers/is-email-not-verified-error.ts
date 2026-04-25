@@ -9,6 +9,8 @@ const EMAIL_NOT_VERIFIED_HINTS = [
   "confirm your email",
   "подтвердите email",
   "почта не подтверждена",
+  "has not been verified",  
+  "not been verified"      
 ] as const
 
 function readStatusCode(error: unknown): number | undefined {
@@ -117,16 +119,23 @@ export function isEmailNotVerifiedError(error: unknown): boolean {
   const statusCode = readStatusCode(error)
   const code = readErrorCode(error)?.toUpperCase()
 
+
   if (code && EMAIL_NOT_VERIFIED_CODE_SET.has(code)) {
     return true
   }
 
-  if (statusCode === 403) {
-    const combined = collectErrorText(error)
-    return EMAIL_NOT_VERIFIED_HINTS.some((hint) => combined.includes(hint))
-  }
-
-  const combined = collectErrorText(error)
+  const combined = collectErrorText(error).toLowerCase()
+  
   if (combined.length === 0) return false
-  return EMAIL_NOT_VERIFIED_HINTS.some((hint) => combined.includes(hint))
+  
+  const hasHint = EMAIL_NOT_VERIFIED_HINTS.some((hint) => {
+    const hintLower = hint.toLowerCase()
+    const includes = combined.includes(hintLower)
+    return includes
+  })
+  
+  
+  if (hasHint) return true
+  
+  return false
 }

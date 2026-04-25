@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -30,6 +30,21 @@ export function EmailConfirmationDialog({
 }: EmailConfirmationDialogProps) {
   const [isResending, setIsResending] = useState(false)
   const [hint, setHint] = useState<string | null>(null)
+  const [internalOpen, setInternalOpen] = useState(open)
+
+  // Синхронизируем internalOpen с пропом open
+  useEffect(() => {
+    console.log(`Open prop changed to: ${open}`)
+    setInternalOpen(open)
+  }, [open])
+
+  const handleOpenChange = (next: boolean) => {
+    console.log('Dialog onOpenChange:', next)
+    if (!next) {
+      onClose()
+      setInternalOpen(false)
+    }
+  }
 
   const handleResend = async () => {
     setIsResending(true)
@@ -39,16 +54,18 @@ export function EmailConfirmationDialog({
         setHint("Письмо отправлено повторно. Проверьте папку «Входящие» и «Спам».")
         return
       }
-
-      // TODO: Call resend confirmation endpoint when backend provides it.
       setHint("Повторная отправка пока недоступна. Проверьте папку «Спам».")
     } finally {
       setIsResending(false)
     }
   }
 
+  useEffect(() => {
+    console.log(`Internal open state: ${internalOpen}`)
+  }, [internalOpen])
+
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+    <Dialog open={internalOpen} onOpenChange={handleOpenChange}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>Подтвердите email</DialogTitle>
@@ -76,4 +93,3 @@ export function EmailConfirmationDialog({
     </Dialog>
   )
 }
-
