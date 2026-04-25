@@ -548,7 +548,7 @@ export function FreelancerSignupWizard() {
           <div>
             <span className="text-sm text-muted-foreground">Уже есть аккаунт? </span>
             <Link
-              href="/"
+              href="/login"
               className="text-sm font-medium text-foreground hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
             >
               Войти
