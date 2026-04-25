@@ -81,12 +81,7 @@ export function LoginForm() {
       console.log(`Login err - ${error}`)
       console.log(isEmailNotVerifiedError(error))
       if (isEmailNotVerifiedError(error)) {
-        console.log('Opening dialog, current state:', isConfirmationDialogOpen)
         setIsConfirmationDialogOpen(true)
-        console.log('New state should be true')
-        setTimeout(() => {
-          console.log('After 0ms, isConfirmationDialogOpen =', isConfirmationDialogOpen)
-        }, 0)
         setTouched((prev) => ({ ...prev, password: false }))
         return
       }
@@ -100,7 +95,6 @@ export function LoginForm() {
       setIsLoading(false)
     }
   }
-  useEffect(() => {console.log(`isConfirmationDialogOpen - ${isConfirmationDialogOpen}`)},[isConfirmationDialogOpen])
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="mx-auto w-full max-w-md">

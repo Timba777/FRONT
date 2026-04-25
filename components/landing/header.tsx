@@ -146,7 +146,7 @@ export function Header() {
               asChild
             >
               <Link 
-                href="/" 
+                href="/login" 
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label="Войти в аккаунт Light"
               >
