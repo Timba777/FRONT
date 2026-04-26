@@ -35,16 +35,17 @@ const freelancerMatches = [
 export function AITechnologySection() {
   return (
     <section 
-      className="bg-secondary/30 py-16 sm:py-24"
+      className="w-full min-w-0 overflow-x-hidden bg-secondary/30 py-14 sm:py-24"
       aria-labelledby="ai-technology-heading"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      <div className="mx-auto w-full min-w-0 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-8 sm:gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left Content */}
-          <div>
+          <div className="min-w-0 text-center md:text-left">
+            <div className="mb-4 flex justify-center md:justify-start">
             <Badge 
               variant="secondary" 
-              className="mb-4 rounded-full px-3 py-1"
+              className="rounded-full px-3 py-1"
               aria-label="Технология AI подбора"
             >
               <span 
@@ -53,21 +54,22 @@ export function AITechnologySection() {
               />
               AI-Powered Matching
             </Badge>
+            </div>
             
             <h2 
               id="ai-technology-heading"
-              className="text-pretty text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+              className="text-pretty text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl sm:leading-tight"
             >
               Технология, которая понимает ваши потребности
             </h2>
             
-            <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+            <p className="mt-4 text-balance text-base leading-relaxed text-muted-foreground sm:text-lg">
               Наш AI не просто подбирает ключевые слова. Он понимает контекст, оценивает портфолио и учитывает доступность, чтобы найти фрилансеров, которые действительно соответствуют требованиям вашего проекта.
             </p>
 
             <ul className="mt-8 space-y-4" aria-label="Преимущества AI подбора">
               {features.map((feature, index) => (
-                <li key={feature} className="flex items-start gap-3">
+                <li key={feature} className="flex flex-col items-center gap-2 text-center md:flex-row md:items-start md:gap-3 md:text-left">
                   <div 
                     className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10"
                     aria-hidden="true"
@@ -81,20 +83,20 @@ export function AITechnologySection() {
           </div>
 
           {/* Right Content - Freelancer Matches Card */}
-          <div className="relative">
+          <div className="relative w-full min-w-0 max-w-sm mx-auto md:mx-0 md:max-w-none">
             <Card 
-              className="overflow-hidden border-border/50 shadow-lg"
+              className="w-full min-w-0 max-w-full overflow-hidden border-border/50 shadow-lg"
               aria-label="Примеры подобранных фрилансеров"
             >
               <CardContent className="p-0">
                 {/* Card Header */}
-                <div className="flex items-center justify-between border-b border-border/50 bg-muted/30 px-5 py-4">
-                  <span className="text-sm font-medium text-foreground">
+                <div className="flex flex-col items-center justify-center gap-2 border-b border-border/50 bg-muted/30 px-3 py-3 text-center sm:px-5 sm:py-4 md:flex-row md:justify-between md:text-left">
+                  <span className="min-w-0 text-sm font-medium text-foreground">
                     Лучшие варианты для вашего проекта
                   </span>
                   <Badge 
                     variant="secondary" 
-                    className="rounded-full text-xs"
+                    className="shrink-0 rounded-full text-xs"
                     aria-label="Найдено 3 фрилансера"
                   >
                     3 найдено
@@ -109,10 +111,12 @@ export function AITechnologySection() {
                   {freelancerMatches.map((freelancer) => (
                     <li
                       key={freelancer.name}
-                      className="flex items-center gap-4 px-5 py-4"
+                      className="px-3 py-3 sm:px-5 sm:py-4"
                       aria-label={`${freelancer.name}, ${freelancer.role}, ставка ${freelancer.rate}, совпадение ${freelancer.match}%`}
                     >
-                      <Avatar className="h-12 w-12">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                        <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+                      <Avatar className="h-12 w-12 shrink-0">
                         <AvatarFallback 
                           className="bg-primary/10 text-primary"
                           aria-label={`Аватар ${freelancer.name}`}
@@ -121,7 +125,7 @@ export function AITechnologySection() {
                         </AvatarFallback>
                       </Avatar>
                       
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="font-medium text-foreground truncate">
                           {freelancer.name}
                         </p>
@@ -132,8 +136,9 @@ export function AITechnologySection() {
                           {freelancer.rate}
                         </p>
                       </div>
+                        </div>
 
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex shrink-0 flex-row items-center justify-end gap-2 sm:flex-col sm:items-end sm:gap-2">
                         <Badge 
                           variant="outline" 
                           className="rounded-full text-xs font-medium text-primary"
@@ -149,6 +154,7 @@ export function AITechnologySection() {
                         >
                           Посмотреть профиль
                         </Button>
+                      </div>
                       </div>
                     </li>
                   ))}

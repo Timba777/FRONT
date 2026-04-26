@@ -34,16 +34,16 @@ const footerLinks = {
 export function Footer() {
   return (
     <footer 
-      className="border-t border-border bg-background"
+      className="w-full min-w-0 max-w-full overflow-x-hidden border-t border-border bg-background"
       role="contentinfo"
       aria-label="Нижний колонтитул сайта"
     >
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="grid gap-8 lg:grid-cols-5">
+      <div className="mx-auto w-full min-w-0 max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+        <div className="grid gap-6 sm:gap-8 lg:grid-cols-5">
           {/* Brand Column */}
-          <div className="lg:col-span-2">
+          <div className="flex flex-col items-center text-center md:items-start md:text-left lg:col-span-2">
             <Logo size={36} />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+            <p className="mx-auto mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground md:mx-0">
               Модная торговая площадка для фрилансеров, объединяющая таланты и возможности
             </p>
            
@@ -51,7 +51,7 @@ export function Footer() {
 
           {/* Links Columns */}
           {Object.entries(footerLinks).map(([key, section]) => (
-            <div key={key}>
+            <div key={key} className="text-center md:text-left">
               <h3 className="text-sm font-semibold text-foreground" id={`footer-section-${key}`}>
                 {section.title}
               </h3>
@@ -77,12 +77,15 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-12 flex flex-col items-center justify-center gap-4 border-t border-border pt-8 text-center sm:flex-row sm:justify-between sm:text-left">
+          <p className="w-full text-sm text-muted-foreground sm:w-auto">
             &copy; 2026 Light. Все права защищены.
           </p>
-          <nav aria-label="Юридическая информация">
-            <ul className="m-0 flex list-none flex-wrap gap-6 p-0" role="list">
+          <nav
+            className="flex w-full max-w-full justify-center sm:w-auto sm:justify-end"
+            aria-label="Юридическая информация"
+          >
+            <ul className="m-0 flex list-none flex-wrap justify-center gap-6 p-0 sm:justify-end" role="list">
               <li role="listitem">
                 <Link
                   href="/privacy-policy"

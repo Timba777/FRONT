@@ -49,9 +49,9 @@ export default function LandingPage() {
       return null
     }
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen w-full min-w-0 max-w-full flex-col max-md:overflow-x-hidden">
       <Header />
-      <main className="flex-1">
+      <main className="min-w-0 flex-1">
         <HeroSection />
         <HowItWorksSection />
         <AITechnologySection />

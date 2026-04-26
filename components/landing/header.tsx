@@ -21,7 +21,7 @@ export function Header() {
   role="banner"
   aria-label="Главная навигация"
 >
-  <div className="flex h-16 w-full items-center justify-between px-6 lg:px-8">
+  <div className="flex h-16 w-full min-w-0 max-w-full items-center justify-between px-4 md:px-6 lg:px-8">
     {/* Left - Logo */}
     <div className="flex shrink-0 items-center">
       <Link 

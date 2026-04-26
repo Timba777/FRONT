@@ -7,7 +7,7 @@ import Image from "next/image"
 export function HeroSection() {
   return (
     <section 
-      className="relative min-h-[90vh] w-full overflow-hidden"
+      className="relative min-h-[72svh] w-full min-w-0 overflow-hidden md:min-h-[90vh]"
       aria-labelledby="hero-heading"
       itemScope
       itemType="https://schema.org/WebPage"
@@ -32,29 +32,29 @@ export function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto flex min-h-[90vh] max-w-7xl items-center px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
-        <div className="w-full lg:w-1/2">
+      <div className="relative z-10 mx-auto flex min-h-[72svh] w-full max-w-7xl items-center justify-center px-4 py-10 sm:px-6 sm:py-24 md:min-h-[90vh] md:justify-start lg:px-8 lg:py-32">
+        <div className="w-full min-w-0 max-w-full text-center md:text-left lg:w-1/2">
           {/* Glass card for text content */}
-          <div className="rounded-3xl bg-white/70 p-8 backdrop-blur-sm sm:p-10 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+          <div className="rounded-3xl bg-white/70 p-5 backdrop-blur-sm sm:p-10 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
             <h1 
               id="hero-heading"
-              className="text-pretty text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+              className="text-pretty text-center text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl md:text-left lg:text-6xl"
               itemProp="headline"
             >
               Наймите специалиста за считанные секунды
             </h1>
             
             <p 
-              className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground"
+              className="mt-4 mx-auto max-w-xl text-balance text-center text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg md:mx-0 md:text-left"
               itemProp="description"
             >
               Light использует AI, чтобы подобрать для вас проверенных фрилансеров, которые идеально подойдут для вашего проекта. Прекратите бесконечный просмотр и начните создавать уже сегодня.
             </p>
             
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="mt-6 flex w-full max-w-sm flex-col items-center justify-center gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-start sm:gap-4">
               <Button
                 size="lg"
-                className="rounded-full px-8 shadow-lg shadow-primary/25 transition-shadow hover:shadow-xl hover:shadow-primary/30"
+                className="w-full min-w-0 rounded-full px-6 text-sm shadow-lg shadow-primary/25 transition-shadow hover:shadow-xl hover:shadow-primary/30 sm:w-auto sm:px-8 sm:text-base"
                 asChild
               >
                 <Link 
@@ -67,7 +67,7 @@ export function HeroSection() {
               <Button
                 variant="outline"
                 size="lg"
-                className="rounded-full bg-white/80 px-8 backdrop-blur-sm transition-colors hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="w-full min-w-0 rounded-full bg-white/80 px-6 text-sm backdrop-blur-sm transition-colors hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto sm:px-8 sm:text-base"
                 onClick={() => {
                   document.getElementById("how-it-works")?.scrollIntoView({ 
                     behavior: "smooth",
@@ -85,7 +85,7 @@ export function HeroSection() {
 
       {/* Bottom fade to next section */}
       <div 
-        className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent"
+        className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent md:h-32"
         aria-hidden="true"
       />
 

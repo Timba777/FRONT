@@ -23,19 +23,19 @@ export function TrustSecuritySection() {
   return (
     <section 
       id="trust-security" 
-      className="bg-secondary/30 py-16 sm:py-24"
+      className="w-full min-w-0 overflow-x-hidden bg-secondary/30 py-14 sm:py-24"
       aria-labelledby="trust-security-heading"
       itemScope
       itemType="https://schema.org/Thing"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl">
+      <div className="mx-auto w-full min-w-0 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full min-w-0 max-w-3xl">
           <Card 
-            className="overflow-hidden border-border/50 shadow-lg"
+            className="w-full min-w-0 max-w-full overflow-hidden border-border/50 shadow-lg"
             role="article"
             aria-label="Информация о безопасности и надежности платформы"
           >
-            <CardContent className="p-8 sm:p-12">
+            <CardContent className="p-5 sm:p-12">
               {/* Icon */}
               <div className="flex justify-center">
                 <div 
@@ -49,7 +49,7 @@ export function TrustSecuritySection() {
               {/* Title */}
               <h2 
                 id="trust-security-heading"
-                className="mt-6 text-center text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
+                className="mt-6 text-center text-xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl sm:leading-tight"
                 itemProp="name"
               >
                 Trust & Security
@@ -57,7 +57,7 @@ export function TrustSecuritySection() {
 
               {/* Description */}
               <p 
-                className="mx-auto mt-4 max-w-xl text-center text-muted-foreground"
+                className="mx-auto mt-4 max-w-xl text-center text-sm leading-relaxed text-muted-foreground sm:text-base"
                 itemProp="description"
               >
                 Ваше спокойствие - наш приоритет. Каждый фрилансер проходит проверку, каждый платеж защищен, а каждый проект подкреплен нашей гарантией.
@@ -65,7 +65,7 @@ export function TrustSecuritySection() {
 
               {/* Features Grid */}
               <ul 
-                className="mt-10 grid list-none gap-8 p-0 m-0 sm:grid-cols-3"
+                className="mt-8 grid list-none gap-6 p-0 m-0 sm:mt-10 sm:grid-cols-3 sm:gap-8"
                 aria-label="Преимущества безопасности платформы"
                 itemScope
                 itemType="https://schema.org/ItemList"
