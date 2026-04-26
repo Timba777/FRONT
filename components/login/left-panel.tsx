@@ -111,15 +111,15 @@ export function LeftPanel() {
         </ul>
       </div>
 
-      {/* CTA Button */}
-      <div className="mt-8">
+      {/* CTA Button — mobile: stable centered block; md+: unchanged layout */}
+      <div className="mt-8 mx-auto flex w-full max-w-[90%] flex-col items-center justify-center px-4 text-center md:mx-0 md:max-w-none md:w-full md:shrink-0 md:px-0 md:text-left">
         <Button
           variant="outline"
-          className="w-full rounded-full border-primary text-primary hover:bg-primary/5"
+          className="h-auto min-h-9 w-full min-w-0 max-w-sm flex-wrap justify-center gap-x-2 gap-y-1 whitespace-normal break-words rounded-full border-primary px-3 py-3 text-center text-balance text-sm font-medium leading-snug text-primary hover:bg-primary/5 md:h-9 md:max-w-none md:flex-nowrap md:px-4 md:py-2 md:leading-normal"
           onClick={() => router.push("/register")}
         >
-          <Sparkles className="mr-2 h-4 w-4" />
-          Новичок в Light? Присоединяйтесь сейчас
+          <Sparkles className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span className="min-w-0">Новичок в Light? Присоединяйтесь сейчас</span>
         </Button>
       </div>
     </div>
