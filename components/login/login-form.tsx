@@ -141,9 +141,17 @@ export function LoginForm() {
 
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium">
-              Пароль <span className="text-destructive">*</span>
-            </Label>
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Пароль <span className="text-destructive">*</span>
+              </Label>
+              <Link
+                href="/auth/password-recovery"
+                className="text-xs font-medium text-primary hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+              >
+                Забыли пароль?
+              </Link>
+            </div>
             <div className="relative">
               <Input
                 id="password"

@@ -12,23 +12,7 @@ import { useAuth } from "@/context/auth-context"
 
 export default function LandingPage() {
     const router = useRouter()
-    const { loading, isAuthenticated, checkAuth } = useAuth()
-  
-    useEffect(() => {
-      let isMounted = true
-      
-      const initAuth = async () => {
-        if (!isAuthenticated && !loading && isMounted) {
-          await checkAuth()
-        }
-      }
-      
-      initAuth()
-      
-      return () => {
-        isMounted = false
-      }
-    }, [])
+    const { loading, isAuthenticated } = useAuth()
   
     // Если пользователь уже авторизован - отправляем на coming-soon
     useEffect(() => {

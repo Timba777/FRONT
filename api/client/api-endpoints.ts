@@ -6,6 +6,10 @@ export const API_ENDPOINTS = {
     /** Same resource as `PROFILE.MY_PROFILE` — kept for existing `auth.api` / `getMe`. */
     ME: "/user-profile/my-profile",
     EMAIL_CONFIRMATION: "/auth/email-confirmation",
+    PASSWORD_RECOVERY: {
+      RESET: "/auth/password-recovery/reset",
+      NEW_PASSWORD: (token: string) => `/auth/password-recovery/new-password/${token}`,
+    },
   },
   /** User profile module — mirrors `auth` grouping (`api/services/profile.api.ts` + `services/profile.ts`). */
   PROFILE: {
